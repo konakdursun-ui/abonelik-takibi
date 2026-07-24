@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Abonelik Takibi</string>
+    <string name="country_section_title">Ulke</string>
+    <string name="country_turkey">Turkiye</string>
+    <string name="country_united_states">Amerika Birlesik Devletleri</string>
+    <string name="country_united_kingdom">Birlesik Krallik</string>
+    <string name="country_germany">Almanya</string>
+    <string name="country_france">Fransa</string>
+    <string name="country_dialog_title">Ulke secimi</string>
+    <string name="country_dialog_description">Ilk kullanim icin ulkeni sec. Turkiye disindaki kullanicilarda uygulama dili otomatik olarak Ingilizce olur.</string>
+    <string name="country_dialog_continue">Devam et</string>
+    <string name="home_new_record">+ Yeni Kayit</string>
+    <string name="section_campaigns">Firsatlar &amp; Kampanyalar</string>
+    <string name="section_view_all">Tumunu Gor</string>
+    <string name="section_category_summary">Kategori ozeti</string>
+    <string name="section_upcoming_payments">Yaklasan Odemeler</string>
+    <string name="section_all_records">Tum Kayitlar</string>
+    <string name="message_no_category_summary">Bu ay icin kategori toplami olusmadi.</string>
+    <string name="message_no_upcoming_payments">Onumuzdeki 7 gun icin bekleyen odeme yok.</string>
+    <string name="message_no_records">Bu ay icin kayit yok. Ilk abonelik veya giderini ekleyebilirsin.</string>
+    <string name="campaign_details">Detaylar</string>
+    <string name="nav_home">Ana Sayfa</string>
+    <string name="nav_categories">Kategoriler</string>
+    <string name="nav_calendar">Takvim</string>
 </resources>

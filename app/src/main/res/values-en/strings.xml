@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Subscription Tracker</string>
+    <string name="country_section_title">Country</string>
+    <string name="country_turkey">Turkey</string>
+    <string name="country_united_states">United States</string>
+    <string name="country_united_kingdom">United Kingdom</string>
+    <string name="country_germany">Germany</string>
+    <string name="country_france">France</string>
+    <string name="country_dialog_title">Select country</string>
+    <string name="country_dialog_description">Choose your country for first-time setup. For users outside Turkey, the app language will switch to English automatically.</string>
+    <string name="country_dialog_continue">Continue</string>
+    <string name="home_new_record">+ New Record</string>
+    <string name="section_campaigns">Offers &amp; Campaigns</string>
+    <string name="section_view_all">See All</string>
+    <string name="section_category_summary">Category summary</string>
+    <string name="section_upcoming_payments">Upcoming Payments</string>
+    <string name="section_all_records">All Records</string>
+    <string name="message_no_category_summary">No category total has been created for this month.</string>
+    <string name="message_no_upcoming_payments">There are no pending payments in the next 7 days.</string>
+    <string name="message_no_records">There are no records for this month. You can add your first subscription or expense.</string>
+    <string name="campaign_details">Details</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_categories">Categories</string>
+    <string name="nav_calendar">Calendar</string>
+</resources>

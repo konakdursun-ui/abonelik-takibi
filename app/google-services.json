@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "878951784782",
+    "project_id": "abonelik-takibi-44440",
+    "storage_bucket": "abonelik-takibi-44440.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878951784782:android:41a5f459b493cc8495fe1f",
+        "android_client_info": {
+          "package_name": "com.dkonak.aboneliktakibi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "878951784782-40ents08mfo950tj6qhu9ujd190dlc06.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dkonak.aboneliktakibi",
+            "certificate_hash": "0dc37a20d72a999404287d86e17e18a764d2c62a"
+          }
+        },
+        {
+          "client_id": "878951784782-70eueu6ghuhrmjsedvln02j8mq7o1131.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dkonak.aboneliktakibi",
+            "certificate_hash": "ab672a580ae3316e09aaee37fea7421890b17b7d"
+          }
+        },
+        {
+          "client_id": "878951784782-vel3csu8694dg08shap5b10gqujptqg5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dkonak.aboneliktakibi",
+            "certificate_hash": "b83550ae35c09c1e5409e6e3e509a43690c0992d"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5niesxqnUQHsQr46iU9sWVToV4tTE5zA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "878951784782-q082696dsrp0l7n5v66utqh9gd85vsnv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

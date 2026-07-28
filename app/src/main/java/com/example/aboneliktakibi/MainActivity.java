@@ -21,6 +21,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -128,6 +129,7 @@ public class MainActivity extends Activity {
     private static final String CLOUD_BACKUPS = "backups";
     private static final String CLOUD_SUBSCRIPTIONS = "subscriptions";
     private static final String CAMPAIGN_FEED_URL = "https://raw.githubusercontent.com/konakdursun-ui/abonelik-takibi-kampanyalar/main/campaigns.json";
+    private static final String[] CURRENCY_OPTIONS = {"USD", "EUR", "GBP", "TRY", "CAD", "AUD", "INR", "JPY"};
     private static final int REQUEST_PICK_PROFILE = 304;
     private static final int REQUEST_GOOGLE_SIGN_IN = 305;
     private static final int SCREEN_HOME = 0;
@@ -143,6 +145,199 @@ public class MainActivity extends Activity {
     private static final String[] CATEGORIES = {
             "Abonelik", "Elektrik", "Su", "Doğalgaz", "İnternet", "Telefon", "Kira", "Ulaşım", "Diğer"
     };
+    private static final Map<String, String> DE_TRANSLATIONS = new HashMap<>();
+    private static final Map<String, String> ES_TRANSLATIONS = new HashMap<>();
+    private static final Map<String, String> FR_TRANSLATIONS = new HashMap<>();
+    private static final Map<String, String> PT_TRANSLATIONS = new HashMap<>();
+
+    static {
+        addTranslation("Subscription Tracker", "Abo-Tracker", "Gestor de suscripciones", "Suivi des abonnements", "Gerenciador de assinaturas");
+        addTranslation("Track subscriptions, bills and monthly expenses in one place.", "Verfolge Abos, Rechnungen und monatliche Ausgaben an einem Ort.", "Controla suscripciones, facturas y gastos mensuales en un solo lugar.", "Suivez vos abonnements, factures et dépenses mensuelles au même endroit.", "Acompanhe assinaturas, contas e despesas mensais em um só lugar.");
+        addTranslation("THIS MONTH\nTOTAL", "DIESER MONAT\nGESAMT", "TOTAL\nDEL MES", "TOTAL\nDU MOIS", "TOTAL\nDO MÊS");
+        addTranslation("PAID", "BEZAHLT", "PAGADO", "PAYÉ", "PAGO");
+        addTranslation("LEFT", "OFFEN", "RESTANTE", "RESTANT", "RESTANTE");
+        addTranslation("New Record", "Neuer Eintrag", "Nuevo registro", "Nouvel enregistrement", "Novo registro");
+        addTranslation("Category summary", "Kategorieübersicht", "Resumen por categoría", "Résumé par catégorie", "Resumo por categoria");
+        addTranslation("Upcoming Payments", "Anstehende Zahlungen", "Pagos próximos", "Paiements à venir", "Pagamentos próximos");
+        addTranslation("See All", "Alle ansehen", "Ver todo", "Tout voir", "Ver tudo");
+        addTranslation("All records", "Alle Einträge", "Todos los registros", "Tous les enregistrements", "Todos os registros");
+        addTranslation("All Records", "Alle Einträge", "Todos los registros", "Tous les enregistrements", "Todos os registros");
+        addTranslation("Top Spending", "Höchste Ausgaben", "Mayor gasto", "Dépense principale", "Maior gasto");
+        addTranslation("Detail", "Detail", "Detalle", "Détail", "Detalhe");
+        addTranslation("Details", "Details", "Detalles", "Détails", "Detalhes");
+        addTranslation("Deals & Campaigns", "Angebote & Kampagnen", "Ofertas y campañas", "Offres et campagnes", "Ofertas e campanhas");
+        addTranslation("Smart Finance Summary", "Smarte Finanzübersicht", "Resumen financiero inteligente", "Résumé financier intelligent", "Resumo financeiro inteligente");
+        addTranslation("Cloud sync on • ", "Cloud-Sync aktiv • ", "Sincronización en la nube activa • ", "Synchronisation cloud active • ", "Sincronização na nuvem ativa • ");
+        addTranslation("Sign in with Google to enable cloud sync", "Mit Google anmelden, um Cloud-Sync zu aktivieren", "Inicia sesión con Google para activar la sincronización", "Connectez-vous avec Google pour activer la synchronisation", "Entre com Google para ativar a sincronização");
+        addTranslation("Country and language", "Land und Sprache", "País e idioma", "Pays et langue", "País e idioma");
+        addTranslation("Choose your country and app language to personalize your account.", "Wähle dein Land und die App-Sprache, um dein Konto anzupassen.", "Elige tu país y el idioma de la app para personalizar tu cuenta.", "Choisissez votre pays et la langue de l'application pour personnaliser votre compte.", "Escolha seu país e o idioma do app para personalizar sua conta.");
+        addTranslation("COUNTRY", "LAND", "PAÍS", "PAYS", "PAÍS");
+        addTranslation("LANGUAGE", "SPRACHE", "IDIOMA", "LANGUE", "IDIOMA");
+        addTranslation("Continue", "Weiter", "Continuar", "Continuer", "Continuar");
+        addTranslation("This month looks ", "Dieser Monat ist ", "Este mes parece ", "Ce mois-ci semble ", "Este mês parece ");
+        addTranslation(" higher than last month.", " höher als letzter Monat.", " más alto que el mes pasado.", " plus élevé que le mois dernier.", " maior que o mês passado.");
+        addTranslation(" lower than last month.", " niedriger als letzter Monat.", " más bajo que el mes pasado.", " plus bas que le mois dernier.", " menor que o mês passado.");
+        addTranslation("Planned total payment this month is ", "Die geplante Zahlung in diesem Monat beträgt ", "El pago total previsto este mes es ", "Le total prévu ce mois-ci est de ", "O total planejado deste mês é ");
+        addTranslation("Estimated total next month is ", "Die Schätzung für nächsten Monat beträgt ", "El total estimado del próximo mes es ", "Le total estimé du mois prochain est de ", "O total estimado do próximo mês é ");
+        addTranslation("Within 7 days, ", "In 7 Tagen stehen ", "En 7 días hay ", "Dans 7 jours, ", "Em 7 dias, ");
+        addTranslation(" payment(s) are coming up.", " Zahlung(en) an.", " pago(s) próximos.", " paiement(s) arrivent.", " pagamento(s) estão chegando.");
+        addTranslation("No upcoming payment this week.", "Diese Woche steht keine Zahlung an.", "No hay pagos próximos esta semana.", "Aucun paiement prévu cette semaine.", "Nenhum pagamento próximo esta semana.");
+        addTranslation("Take control of\nyour financial\nfreedom.", "Übernimm die Kontrolle\nüber deine finanzielle\nFreiheit.", "Toma el control\nde tu libertad\nfinanciera.", "Prenez le contrôle\nde votre liberté\nfinancière.", "Assuma o controle\nda sua liberdade\nfinanceira.");
+        addTranslation("Continue with Google", "Mit Google fortfahren", "Continuar con Google", "Continuer avec Google", "Continuar com Google");
+        addTranslation("Secure sign-in with your Google account", "Sichere Anmeldung mit deinem Google-Konto", "Inicio de sesión seguro con tu cuenta de Google", "Connexion sécurisée avec votre compte Google", "Login seguro com sua conta Google");
+        addTranslation("Create Account", "Konto erstellen", "Crear cuenta", "Créer un compte", "Criar conta");
+        addTranslation("Create an account to start tracking.", "Erstelle ein Konto, um mit dem Tracking zu beginnen.", "Crea una cuenta para empezar el seguimiento.", "Créez un compte pour commencer le suivi.", "Crie uma conta para começar a acompanhar.");
+        addTranslation("Full Name", "Vollständiger Name", "Nombre completo", "Nom complet", "Nome completo");
+        addTranslation("Email", "E-Mail", "Correo electrónico", "E-mail", "E-mail");
+        addTranslation("Password", "Passwort", "Contraseña", "Mot de passe", "Senha");
+        addTranslation("Sign Up", "Registrieren", "Registrarse", "S'inscrire", "Cadastrar");
+        addTranslation("Sign up with Google", "Mit Google registrieren", "Registrarse con Google", "S'inscrire avec Google", "Cadastrar com Google");
+        addTranslation("Already have an account?   Sign In", "Du hast schon ein Konto?   Anmelden", "¿Ya tienes una cuenta?   Iniciar sesión", "Vous avez déjà un compte ?   Connexion", "Já tem uma conta?   Entrar");
+        addTranslation("Sign In", "Anmelden", "Iniciar sesión", "Connexion", "Entrar");
+        addTranslation("Continue with your registered email and password.", "Mit registrierter E-Mail und Passwort fortfahren.", "Continúa con tu correo y contraseña registrados.", "Continuez avec votre e-mail et mot de passe enregistrés.", "Continue com seu e-mail e senha cadastrados.");
+        addTranslation("No account?   Sign up", "Kein Konto?   Registrieren", "¿No tienes cuenta?   Regístrate", "Pas de compte ?   Inscription", "Sem conta?   Cadastre-se");
+        addTranslation("Categories", "Kategorien", "Categorías", "Catégories", "Categorias");
+        addTranslation("Estimated ", "Geschätzte ", "Estimado ", "Estimé ", "Estimado ");
+        addTranslation(" Category Expenses", " Kategorieausgaben", " gastos por categoría", " dépenses par catégorie", " despesas por categoria");
+        addTranslation("No categorized records this month.", "Keine kategorisierten Einträge in diesem Monat.", "No hay registros categorizados este mes.", "Aucun enregistrement catégorisé ce mois-ci.", "Nenhum registro categorizado este mês.");
+        addTranslation(" records", " Einträge", " registros", " enregistrements", " registros");
+        addTranslation("Monthly Expense Chart", "Monatliches Ausgabendiagramm", "Gráfico de gastos mensuales", "Graphique des dépenses mensuelles", "Gráfico de despesas mensais");
+        addTranslation("Past/Future 6 months", "Vergangenheit/Zukunft 6 Monate", "Pasado/Futuro 6 meses", "Passé/Futur 6 mois", "Passado/Futuro 6 meses");
+        addTranslation("Past/Future 1 year", "Vergangenheit/Zukunft 1 Jahr", "Pasado/Futuro 1 año", "Passé/Futur 1 an", "Passado/Futuro 1 ano");
+        addTranslation("Past/Future 3 years", "Vergangenheit/Zukunft 3 Jahre", "Pasado/Futuro 3 años", "Passé/Futur 3 ans", "Passado/Futuro 3 anos");
+        addTranslation("Chart Time Range", "Diagrammzeitraum", "Rango del gráfico", "Plage du graphique", "Intervalo do gráfico");
+        addTranslation("Cancel", "Abbrechen", "Cancelar", "Annuler", "Cancelar");
+        addTranslation("Total: ", "Gesamt: ", "Total: ", "Total : ", "Total: ");
+        addTranslation("No payment for the selected day.", "Keine Zahlung für den ausgewählten Tag.", "No hay pagos para el día seleccionado.", "Aucun paiement pour le jour sélectionné.", "Nenhum pagamento para o dia selecionado.");
+        addTranslation("All Payments This Month", "Alle Zahlungen diesen Monat", "Todos los pagos de este mes", "Tous les paiements de ce mois", "Todos os pagamentos deste mês");
+        addTranslation("This Month", "Dieser Monat", "Este mes", "Ce mois-ci", "Este mês");
+        addTranslation("No payments visible this month.", "Keine Zahlungen in diesem Monat sichtbar.", "No hay pagos visibles este mes.", "Aucun paiement visible ce mois-ci.", "Nenhum pagamento visível este mês.");
+        addTranslation("Settings", "Einstellungen", "Ajustes", "Paramètres", "Configurações");
+        addTranslation("Account", "Konto", "Cuenta", "Compte", "Conta");
+        addTranslation("Personal Info", "Persönliche Daten", "Información personal", "Informations personnelles", "Informações pessoais");
+        addTranslation("Notifications", "Benachrichtigungen", "Notificaciones", "Notifications", "Notificações");
+        addTranslation("On", "Ein", "Activado", "Activé", "Ativo");
+        addTranslation("Off", "Aus", "Desactivado", "Désactivé", "Desativado");
+        addTranslation("Preferences", "Einstellungen", "Preferencias", "Préférences", "Preferências");
+        addTranslation("Currency", "Währung", "Moneda", "Devise", "Moeda");
+        addTranslation("Country", "Land", "País", "Pays", "País");
+        addTranslation("Theme", "Design", "Tema", "Thème", "Tema");
+        addTranslation("Language", "Sprache", "Idioma", "Langue", "Idioma");
+        addTranslation("Info", "Info", "Información", "Infos", "Informações");
+        addTranslation("Security", "Sicherheit", "Seguridad", "Sécurité", "Segurança");
+        addTranslation("Local records", "Lokale Einträge", "Registros locales", "Enregistrements locaux", "Registros locais");
+        addTranslation("About", "Über", "Acerca de", "À propos", "Sobre");
+        addTranslation("Session", "Sitzung", "Sesión", "Session", "Sessão");
+        addTranslation("Sign Out", "Abmelden", "Cerrar sesión", "Déconnexion", "Sair");
+        addTranslation("Edit Record", "Eintrag bearbeiten", "Editar registro", "Modifier l'enregistrement", "Editar registro");
+        addTranslation("Ex: Netflix Premium", "Bsp.: Netflix Premium", "Ej.: Netflix Premium", "Ex. : Netflix Premium", "Ex.: Netflix Premium");
+        addTranslation("Record Name", "Eintragsname", "Nombre del registro", "Nom de l'enregistrement", "Nome do registro");
+        addTranslation("Amount", "Betrag", "Importe", "Montant", "Valor");
+        addTranslation("Payment Date: ", "Zahlungsdatum: ", "Fecha de pago: ", "Date de paiement : ", "Data de pagamento: ");
+        addTranslation("CATEGORY", "KATEGORIE", "CATEGORÍA", "CATÉGORIE", "CATEGORIA");
+        addTranslation("Repeats monthly", "Wiederholt sich monatlich", "Se repite mensualmente", "Se répète chaque mois", "Repete mensalmente");
+        addTranslation("Creates automatic monthly records", "Erstellt automatische monatliche Einträge", "Crea registros mensuales automáticos", "Crée des enregistrements mensuels automatiques", "Cria registros mensais automáticos");
+        addTranslation("Enable reminder", "Erinnerung aktivieren", "Activar recordatorio", "Activer le rappel", "Ativar lembrete");
+        addTranslation("Notify before payment at your chosen interval", "Vor der Zahlung im gewählten Intervall benachrichtigen", "Notifica antes del pago en el intervalo elegido", "Notifier avant le paiement selon l'intervalle choisi", "Notificar antes do pagamento no intervalo escolhido");
+        addTranslation("Daily", "Täglich", "Diario", "Quotidien", "Diário");
+        addTranslation("Weekly", "Wöchentlich", "Semanal", "Hebdomadaire", "Semanal");
+        addTranslation("Monthly", "Monatlich", "Mensual", "Mensuel", "Mensal");
+        addTranslation("Yearly", "Jährlich", "Anual", "Annuel", "Anual");
+        addTranslation("Reminder frequency: ", "Erinnerungshäufigkeit: ", "Frecuencia de recordatorio: ", "Fréquence du rappel : ", "Frequência do lembrete: ");
+        addTranslation("REMINDER FREQUENCY", "ERINNERUNGSHÄUFIGKEIT", "FRECUENCIA DE RECORDATORIO", "FRÉQUENCE DU RAPPEL", "FREQUÊNCIA DO LEMBRETE");
+        addTranslation("SUBSCRIPTION END DATE", "ABO-ENDDATUM", "FECHA DE FIN DE SUSCRIPCIÓN", "DATE DE FIN D'ABONNEMENT", "DATA DE TÉRMINO DA ASSINATURA");
+        addTranslation("Save", "Speichern", "Guardar", "Enregistrer", "Salvar");
+        addTranslation("Delete", "Löschen", "Eliminar", "Supprimer", "Excluir");
+        addTranslation("POPULAR SERVICES", "BELIEBTE DIENSTE", "SERVICIOS POPULARES", "SERVICES POPULAIRES", "SERVIÇOS POPULARES");
+        addTranslation("Pick popular services for your region and auto-fill the record.", "Wähle beliebte Dienste für deine Region und fülle den Eintrag automatisch aus.", "Elige servicios populares de tu región y completa el registro automáticamente.", "Choisissez des services populaires de votre région et remplissez automatiquement l'enregistrement.", "Escolha serviços populares da sua região e preencha o registro automaticamente.");
+        addTranslation("Plans", "Tarife", "Planes", "Formules", "Planos");
+        addTranslation("plans", "Tarife", "planes", "formules", "planos");
+        addTranslation("enter current price", "aktuellen Preis eingeben", "introduce el precio actual", "saisir le prix actuel", "inserir preço atual");
+        addTranslation("Plan selected. Check the date and save.", "Tarif ausgewählt. Datum prüfen und speichern.", "Plan seleccionado. Revisa la fecha y guarda.", "Formule sélectionnée. Vérifiez la date et enregistrez.", "Plano selecionado. Verifique a data e salve.");
+        addTranslation("Plan selected. Enter the current price shown by the service.", "Tarif ausgewählt. Gib den aktuellen Preis des Dienstes ein.", "Plan seleccionado. Introduce el precio actual mostrado por el servicio.", "Formule sélectionnée. Saisissez le prix actuel affiché par le service.", "Plano selecionado. Insira o preço atual mostrado pelo serviço.");
+        addTranslation("Campaigns", "Kampagnen", "Campañas", "Campagnes", "Campanhas");
+        addTranslation("Official source", "Offizielle Quelle", "Fuente oficial", "Source officielle", "Fonte oficial");
+        addTranslation("Expired • ", "Abgelaufen • ", "Vencido • ", "Expiré • ", "Expirado • ");
+        addTranslation("For you • ", "Für dich • ", "Para ti • ", "Pour vous • ", "Para você • ");
+        addTranslation("Campaign", "Kampagne", "Campaña", "Campagne", "Campanha");
+        addTranslation("Review terms", "Bedingungen prüfen", "Revisar condiciones", "Voir les conditions", "Ver termos");
+        addTranslation("EXPIRED", "ABGELAUFEN", "VENCIDO", "EXPIRÉ", "EXPIRADO");
+        addTranslation("OFFICIAL", "OFFIZIELL", "OFICIAL", "OFFICIEL", "OFICIAL");
+        addTranslation("Open official campaign page  ›", "Offizielle Kampagnenseite öffnen  ›", "Abrir página oficial de la campaña  ›", "Ouvrir la page officielle de la campagne  ›", "Abrir página oficial da campanha  ›");
+        addTranslation("Page could not be opened.", "Seite konnte nicht geöffnet werden.", "No se pudo abrir la página.", "La page n'a pas pu être ouverte.", "Não foi possível abrir a página.");
+        addTranslation("Name and amount are required.", "Name und Betrag sind erforderlich.", "Nombre e importe son obligatorios.", "Le nom et le montant sont requis.", "Nome e valor são obrigatórios.");
+        addTranslation("Check the amount.", "Betrag prüfen.", "Revisa el importe.", "Vérifiez le montant.", "Verifique o valor.");
+        addTranslation("Change Photo", "Foto ändern", "Cambiar foto", "Changer la photo", "Alterar foto");
+        addTranslation("Light", "Hell", "Claro", "Clair", "Claro");
+        addTranslation("Dark", "Dunkel", "Oscuro", "Sombre", "Escuro");
+        addTranslation("Notification Settings", "Benachrichtigungseinstellungen", "Ajustes de notificaciones", "Paramètres de notification", "Configurações de notificação");
+        addTranslation("OK", "OK", "Aceptar", "OK", "OK");
+        addTranslation("Version ", "Version ", "Versión ", "Version ", "Versão ");
+        addTranslation("Your personal finance assistant for tracking subscriptions, bills and expenses.", "Dein persönlicher Finanzassistent für Abos, Rechnungen und Ausgaben.", "Tu asistente financiero personal para suscripciones, facturas y gastos.", "Votre assistant financier personnel pour suivre abonnements, factures et dépenses.", "Seu assistente financeiro pessoal para acompanhar assinaturas, contas e despesas.");
+        addTranslation("No pending payment for the next 7 days.", "Keine offenen Zahlungen in den nächsten 7 Tagen.", "No hay pagos pendientes en los próximos 7 días.", "Aucun paiement en attente dans les 7 prochains jours.", "Nenhum pagamento pendente nos próximos 7 dias.");
+        addTranslation("Other Records This Month", "Weitere Einträge in diesem Monat", "Otros registros de este mes", "Autres enregistrements ce mois-ci", "Outros registros deste mês");
+        addTranslation("Past months on the left, estimated future months on the right • Swipe to review", "Vergangene Monate links, geschätzte zukünftige Monate rechts • Zum Prüfen wischen", "Meses pasados a la izquierda, meses futuros estimados a la derecha • Desliza para revisar", "Mois passés à gauche, mois futurs estimés à droite • Faites glisser pour consulter", "Meses anteriores à esquerda, meses futuros estimados à direita • Deslize para revisar");
+        addTranslation("Today", "Heute", "Hoy", "Aujourd'hui", "Hoje");
+        addTranslation(" days left", " Tage übrig", " días restantes", " jours restants", " dias restantes");
+        addTranslation("No category total for this month yet.", "Noch keine Kategoriesumme für diesen Monat.", "Aún no hay total por categoría este mes.", "Aucun total par catégorie pour ce mois.", "Ainda não há total por categoria este mês.");
+        addTranslation("No records this month. Add your first subscription or expense.", "Keine Einträge in diesem Monat. Füge dein erstes Abo oder deine erste Ausgabe hinzu.", "No hay registros este mes. Añade tu primera suscripción o gasto.", "Aucun enregistrement ce mois-ci. Ajoutez votre premier abonnement ou dépense.", "Nenhum registro este mês. Adicione sua primeira assinatura ou despesa.");
+        addTranslation("Past average", "Vergangener Durchschnitt", "Promedio anterior", "Moyenne passée", "Média anterior");
+        addTranslation("Mark pending", "Als offen markieren", "Marcar pendiente", "Marquer en attente", "Marcar pendente");
+        addTranslation("Edit", "Bearbeiten", "Editar", "Modifier", "Editar");
+        addTranslation("Actual amount", "Tatsächlicher Betrag", "Importe real", "Montant réel", "Valor real");
+        addTranslation(" bill • ", " Rechnung • ", " factura • ", " facture • ", " conta • ");
+        addTranslation("This is the final month; your plan is ending.", "Dies ist der letzte Monat; dein Tarif endet.", "Este es el último mes; tu plan termina.", "C'est le dernier mois ; votre formule se termine.", "Este é o último mês; seu plano está terminando.");
+        addTranslation("Enter a valid amount", "Gib einen gültigen Betrag ein", "Introduce un importe válido", "Saisissez un montant valide", "Insira um valor válido");
+        addTranslation("Final plan payment", "Letzte Tarifzahlung", "Pago final del plan", "Paiement final de la formule", "Pagamento final do plano");
+        addTranslation("Mark paid", "Als bezahlt markieren", "Marcar pagado", "Marquer payé", "Marcar como pago");
+        addTranslation("Status: ", "Status: ", "Estado: ", "Statut : ", "Status: ");
+        addTranslation("Reminder: ", "Erinnerung: ", "Recordatorio: ", "Rappel : ", "Lembrete: ");
+        addTranslation("End: ", "Ende: ", "Fin: ", "Fin : ", "Fim: ");
+        addTranslation("No end date", "Kein Enddatum", "Sin fecha de fin", "Pas de date de fin", "Sem data de término");
+        addTranslation("Close", "Schließen", "Cerrar", "Fermer", "Fechar");
+        addTranslation("Reminder frequency", "Erinnerungshäufigkeit", "Frecuencia de recordatorio", "Fréquence du rappel", "Frequência do lembrete");
+        addTranslation("End Date: ", "Enddatum: ", "Fecha de fin: ", "Date de fin : ", "Data de término: ");
+        addTranslation("No end date (tap to select)", "Kein Enddatum (zum Auswählen tippen)", "Sin fecha de fin (toca para elegir)", "Pas de date de fin (touchez pour choisir)", "Sem data de término (toque para selecionar)");
+        addTranslation("Subscription end date", "Abo-Enddatum", "Fecha de fin de suscripción", "Date de fin d'abonnement", "Data de término da assinatura");
+        addTranslation("Select date", "Datum wählen", "Seleccionar fecha", "Choisir une date", "Selecionar data");
+        addTranslation("Remove end date", "Enddatum entfernen", "Eliminar fecha de fin", "Supprimer la date de fin", "Remover data de término");
+        addTranslation("New record", "Neuer Eintrag", "Nuevo registro", "Nouvel enregistrement", "Novo registro");
+        addTranslation("Edit record", "Eintrag bearbeiten", "Editar registro", "Modifier l'enregistrement", "Editar registro");
+        addTranslation("Delete record", "Eintrag löschen", "Eliminar registro", "Supprimer l'enregistrement", "Excluir registro");
+        addTranslation(" will be deleted. Continue?", " wird gelöscht. Fortfahren?", " se eliminará. ¿Continuar?", " sera supprimé. Continuer ?", " será excluído. Continuar?");
+        addTranslation(" will be permanently deleted. Continue?", " wird dauerhaft gelöscht. Fortfahren?", " se eliminará permanentemente. ¿Continuar?", " sera supprimé définitivement. Continuer ?", " será excluído permanentemente. Continuar?");
+        addTranslation("Cancellation page could not be opened.", "Kündigungsseite konnte nicht geöffnet werden.", "No se pudo abrir la página de cancelación.", "La page d'annulation n'a pas pu être ouverte.", "Não foi possível abrir a página de cancelamento.");
+        addTranslation(" payment reminder", " Zahlungserinnerung", " recordatorio de pago", " rappel de paiement", " lembrete de pagamento");
+        addTranslation("Google sign-in", "Google-Anmeldung", "Inicio con Google", "Connexion Google", "Login com Google");
+        addTranslation("Verifying account...", "Konto wird geprüft...", "Verificando cuenta...", "Vérification du compte...", "Verificando conta...");
+        addTranslation("Google configuration is missing.", "Google-Konfiguration fehlt.", "Falta la configuración de Google.", "La configuration Google est manquante.", "A configuração do Google está ausente.");
+        addTranslation("Google configuration is not ready.", "Google-Konfiguration ist nicht bereit.", "La configuración de Google no está lista.", "La configuration Google n'est pas prête.", "A configuração do Google não está pronta.");
+        addTranslation("Firebase session is not ready.", "Firebase-Sitzung ist nicht bereit.", "La sesión de Firebase no está lista.", "La session Firebase n'est pas prête.", "A sessão do Firebase não está pronta.");
+        addTranslation("Google sign-in could not be completed: ", "Google-Anmeldung konnte nicht abgeschlossen werden: ", "No se pudo completar el inicio con Google: ", "La connexion Google n'a pas pu être terminée : ", "Não foi possível concluir o login com Google: ");
+        addTranslation("Google sign-in was cancelled: ", "Google-Anmeldung wurde abgebrochen: ", "El inicio con Google fue cancelado: ", "La connexion Google a été annulée : ", "O login com Google foi cancelado: ");
+        addTranslation("Exit App", "App beenden", "Salir de la app", "Quitter l'application", "Sair do app");
+        addTranslation("Do you want to exit the app?", "Möchtest du die App beenden?", "¿Quieres salir de la app?", "Voulez-vous quitter l'application ?", "Deseja sair do app?");
+        addTranslation("Exit", "Beenden", "Salir", "Quitter", "Sair");
+        addTranslation("Subscription", "Abo", "Suscripción", "Abonnement", "Assinatura");
+        addTranslation("Electricity", "Strom", "Electricidad", "Électricité", "Eletricidade");
+        addTranslation("Water", "Wasser", "Agua", "Eau", "Água");
+        addTranslation("Natural Gas", "Erdgas", "Gas natural", "Gaz naturel", "Gás natural");
+        addTranslation("Internet", "Internet", "Internet", "Internet", "Internet");
+        addTranslation("Phone", "Telefon", "Teléfono", "Téléphone", "Telefone");
+        addTranslation("Rent", "Miete", "Alquiler", "Loyer", "Aluguel");
+        addTranslation("Transport", "Transport", "Transporte", "Transport", "Transporte");
+        addTranslation("Groceries", "Lebensmittel", "Comestibles", "Courses", "Mercado");
+        addTranslation("Other", "Sonstiges", "Otro", "Autre", "Outro");
+        addTranslation("Home", "Start", "Inicio", "Accueil", "Início");
+        addTranslation("Calendar", "Kalender", "Calendario", "Calendrier", "Calendário");
+    }
+
+    private static void addTranslation(String en, String de, String es, String fr, String pt) {
+        DE_TRANSLATIONS.put(en, de);
+        ES_TRANSLATIONS.put(en, es);
+        FR_TRANSLATIONS.put(en, fr);
+        PT_TRANSLATIONS.put(en, pt);
+    }
 
     private final List<ExpenseItem> items = new ArrayList<>();
     private final NumberFormat amountFormat = NumberFormat.getNumberInstance(new Locale("tr", "TR"));
@@ -175,6 +370,7 @@ public class MainActivity extends Activity {
     private String webClientId = "";
     private boolean applyingCloudData;
     private boolean pendingCloudLoad;
+    private boolean pendingCountryPromptAfterCloud;
     private boolean cloudLoadInProgress;
     private boolean cloudSyncWarningShown;
 
@@ -209,21 +405,26 @@ public class MainActivity extends Activity {
         window.setStatusBarColor(COLOR_BG);
         window.setNavigationBarColor(COLOR_SURFACE);
         PaymentReminderReceiver.createChannel(this);
-        requestNotificationPermissionIfNeeded();
         initializeFirebase();
         migrateLegacyProfileIfNeeded();
-        loadItems();
+        if (isLoggedIn()) {
+            loadItems();
+        } else {
+            items.clear();
+        }
         setContentView(createContentView());
         registerSystemBackNavigation();
         suppressScreenHistory = true;
-        showScreen(SCREEN_HOME);
+        showScreen(isLoggedIn() ? SCREEN_HOME : SCREEN_LOGIN);
         suppressScreenHistory = false;
-        ensureCountrySelectionPrompt();
         if (pendingCloudLoad) {
             pendingCloudLoad = false;
             loadCloudData();
         }
-        scheduleReminders();
+        if (isLoggedIn()) {
+            requestNotificationPermissionIfNeeded();
+            scheduleReminders();
+        }
     }
 
     private void showStartupFallback(Throwable throwable) {
@@ -361,10 +562,6 @@ public class MainActivity extends Activity {
     private void buildHomeScreen() {
         content.addView(topAppBar(ui("Abonelik Takibi", "Subscription Tracker"), true));
 
-        TextView subtitle = text(ui("Aboneliklerini, faturalarını ve aylık giderlerini tek yerden izle.", "Track subscriptions, bills and monthly expenses in one place."), 16, COLOR_MUTED, Typeface.NORMAL);
-        subtitle.setPadding(0, dp(8), 0, dp(20));
-        content.addView(subtitle);
-
         LinearLayout stats = new LinearLayout(this);
         stats.setOrientation(LinearLayout.HORIZONTAL);
         stats.setLayoutParams(new LinearLayout.LayoutParams(
@@ -375,8 +572,6 @@ public class MainActivity extends Activity {
         upcomingText = statCard(stats, ui("KALAN", "LEFT"), COLOR_ACCENT);
         content.addView(stats);
 
-        content.addView(smartInsightCard());
-
         Button addRecord = primaryButton("+  " + ui("Yeni Kayıt", "New Record"));
         addRecord.setOnClickListener(v -> openRecordScreen(null));
         LinearLayout.LayoutParams addParams = new LinearLayout.LayoutParams(
@@ -386,19 +581,16 @@ public class MainActivity extends Activity {
         addParams.setMargins(0, dp(20), 0, dp(24));
         content.addView(addRecord, addParams);
 
-        content.addView(homeCampaignStrip());
-
-        content.addView(sectionTitle(ui("Kategori özeti", "Category summary")));
-        categoryList = listContainer();
-        content.addView(categoryList);
-
         content.addView(sectionHeader(ui("Yaklaşan Ödemeler", "Upcoming Payments"), ui("Tümünü Gör", "See All")));
         upcomingList = listContainer();
         content.addView(upcomingList);
 
-        content.addView(sectionTitle(ui("Tüm kayıtlar", "All records")));
+        content.addView(sectionTitle(ui("Bu Ayki Diğer Kayıtlar", "Other Records This Month")));
         allItemsList = listContainer();
         content.addView(allItemsList);
+
+        content.addView(smartInsightCard());
+        content.addView(homeCampaignStrip());
         render();
     }
 
@@ -421,13 +613,14 @@ public class MainActivity extends Activity {
         list.setOrientation(LinearLayout.HORIZONTAL);
         String cached = getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_CAMPAIGN_CACHE, "");
         if (!renderCampaignFeed(list, cached, true)) {
-            renderFallbackCampaigns(list, true);
+            renderFallbackCampaignsForCountry(list, true);
         }
+        section.setVisibility(list.getChildCount() == 0 ? View.GONE : View.VISIBLE);
         scroll.addView(list);
         LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(210));
         scrollParams.setMargins(0, dp(10), 0, dp(20));
         section.addView(scroll, scrollParams);
-        loadRemoteCampaigns(list, true);
+        loadRemoteCampaigns(list, true, section);
         return section;
     }
 
@@ -455,12 +648,7 @@ public class MainActivity extends Activity {
         LinearLayout top = new LinearLayout(this);
         top.setGravity(Gravity.CENTER_VERTICAL);
         top.addView(text(ui("Akıllı Finans Özeti", "Smart Finance Summary"), 18, Color.WHITE, Typeface.BOLD),
-                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        TextView premium = text("PREMIUM", 10, Color.rgb(78, 48, 0), Typeface.BOLD);
-        premium.setGravity(Gravity.CENTER);
-        premium.setPadding(dp(10), dp(5), dp(10), dp(5));
-        premium.setBackground(round(Color.rgb(255, 202, 99), dp(12), 0));
-        top.addView(premium);
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         card.addView(top);
 
         for (String insight : buildSmartInsights()) {
@@ -488,10 +676,30 @@ public class MainActivity extends Activity {
     }
 
     private String ui(String tr, String en) {
-        return isEnglish() ? en : tr;
+        String language = getLanguageCode();
+        if ("tr".equals(language)) {
+            return tr;
+        }
+        if ("de".equals(language)) {
+            return translatedText(en, DE_TRANSLATIONS);
+        }
+        if ("es".equals(language)) {
+            return translatedText(en, ES_TRANSLATIONS);
+        }
+        if ("fr".equals(language)) {
+            return translatedText(en, FR_TRANSLATIONS);
+        }
+        if ("pt".equals(language)) {
+            return translatedText(en, PT_TRANSLATIONS);
+        }
+        return en;
     }
 
-    private String getLanguageCode() {
+    private String translatedText(String en, Map<String, String> translations) {
+        String translated = translations.get(en);
+        return translated == null ? en : translated;
+    }
+private String getLanguageCode() {
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         if (prefs.contains(KEY_LANGUAGE)) {
             return prefs.getString(KEY_LANGUAGE, "tr");
@@ -500,11 +708,23 @@ public class MainActivity extends Activity {
     }
 
     private String getLanguageName() {
-        return isEnglish() ? "English" : "Türkçe";
+        String language = getLanguageCode();
+        if ("tr".equals(language)) return "Türkçe";
+        if ("de".equals(language)) return "Deutsch";
+        if ("es".equals(language)) return "Español";
+        if ("fr".equals(language)) return "Français";
+        if ("pt".equals(language)) return "Português";
+        return "English";
     }
 
     private Locale appLocale() {
-        return isEnglish() ? Locale.US : new Locale("tr", "TR");
+        String language = getLanguageCode();
+        if ("tr".equals(language)) return new Locale("tr", "TR");
+        if ("de".equals(language)) return Locale.GERMANY;
+        if ("es".equals(language)) return new Locale("es", "ES");
+        if ("fr".equals(language)) return Locale.FRANCE;
+        if ("pt".equals(language)) return new Locale("pt", "BR");
+        return Locale.US;
     }
 
     private String currentCountryCode() {
@@ -528,47 +748,137 @@ public class MainActivity extends Activity {
     }
 
     private void ensureCountrySelectionPrompt() {
-        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
-        if (prefs.getBoolean(KEY_COUNTRY_PROMPT_COMPLETED, false)) {
+        if (isCountryPromptCompletedForCurrentUser()) {
             return;
         }
 
-        final String[] values = {"TR", "US", "GB", "DE", "FR"};
-        final String[] labels = {
-                ui("Türkiye", "Turkey"),
-                ui("Amerika Birleşik Devletleri", "United States"),
-                ui("Birleşik Krallık", "United Kingdom"),
-                ui("Almanya", "Germany"),
-                ui("Fransa", "France")
-        };
+        showCountryLanguageSetupDialog();
+    }
 
-        int checked = 0;
-        String current = currentCountryCode();
+    private boolean isCountryPromptCompletedForCurrentUser() {
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        String email = getUserEmail();
+        if (email != null && !email.trim().isEmpty()) {
+            return prefs.getBoolean(countryPromptCompletedKey(email), false);
+        }
+        return prefs.getBoolean(KEY_COUNTRY_PROMPT_COMPLETED, false);
+    }
+
+    private String countryPromptCompletedKey(String email) {
+        return KEY_COUNTRY_PROMPT_COMPLETED + "_" + email.trim().toLowerCase(Locale.US);
+    }
+
+    private void showCountryLanguageSetupDialog() {
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        final String[] countryValues = {"TR", "US", "GB", "DE", "ES", "FR", "PT", "BR", "CA", "AU", "IN", "JP"};
+        final String[] countryLabels = {
+                "Türkiye",
+                "United States",
+                "United Kingdom",
+                "Germany",
+                "Spain",
+                "France",
+                "Portugal",
+                "Brazil",
+                "Canada",
+                "Australia",
+                "India",
+                "Japan"
+        };
+        final String[] languageValues = {"en", "tr", "de", "es", "fr", "pt"};
+        final String[] languageLabels = {"English", "Türkçe", "Deutsch", "Español", "Français", "Português"};
+
+        LinearLayout body = new LinearLayout(this);
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.setPadding(dp(22), dp(20), dp(22), dp(20));
+        body.setBackground(round(COLOR_SURFACE, dp(18), 0));
+
+        TextView title = text(ui("Ülke ve dil", "Country and language"), 22, COLOR_TEXT, Typeface.BOLD);
+        body.addView(title);
+
+        TextView message = text(ui("Hesabını kişiselleştirmek için ülke ve uygulama dilini seç.",
+                "Choose your country and app language to personalize your account."), 14, COLOR_MUTED, Typeface.NORMAL);
+        message.setPadding(0, dp(8), 0, dp(18));
+        body.addView(message);
+
+        body.addView(formLabel(ui("ÜLKE", "COUNTRY")));
+        Spinner countrySpinner = setupSpinner(countryLabels);
+        int countryIndex = indexOf(countryValues, currentCountryCode(), 0);
+        countrySpinner.setSelection(countryIndex);
+        body.addView(countrySpinner, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(54)));
+
+        body.addView(spacer(dp(14)));
+        body.addView(formLabel(ui("DİL", "LANGUAGE")));
+        Spinner languageSpinner = setupSpinner(languageLabels);
+        String defaultLanguage = prefs.contains(KEY_LANGUAGE) ? getLanguageCode() : ("TR".equals(currentCountryCode()) ? "tr" : "en");
+        languageSpinner.setSelection(indexOf(languageValues, defaultLanguage, 0));
+        body.addView(languageSpinner, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(54)));
+
+        body.addView(spacer(dp(18)));
+        Button continueButton = primaryButton(ui("Devam et", "Continue"));
+        body.addView(continueButton, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(54)));
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(body)
+                .setCancelable(false)
+                .create();
+        continueButton.setOnClickListener(v -> {
+            String countryCode = countryValues[countrySpinner.getSelectedItemPosition()];
+            String languageCode = languageValues[languageSpinner.getSelectedItemPosition()];
+            prefs.edit()
+                    .putString(KEY_COUNTRY, countryCode)
+                    .putString(KEY_LANGUAGE, languageCode)
+                    .putString(KEY_CURRENCY, defaultCurrencyForCountry(countryCode))
+                    .putBoolean(KEY_COUNTRY_PROMPT_COMPLETED, true)
+                    .putBoolean(countryPromptCompletedKey(getUserEmail()), true)
+                    .apply();
+            syncToCloud();
+            dialog.dismiss();
+            rebuildCurrentScreen();
+        });
+        dialog.setOnShowListener(d -> {
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(round(Color.TRANSPARENT, dp(18), 0));
+            }
+        });
+        dialog.show();
+    }
+
+    private String defaultCurrencyForCountry(String countryCode) {
+        String country = countryCode == null ? "" : countryCode.toUpperCase(Locale.US);
+        if ("TR".equals(country)) return "TRY";
+        if ("US".equals(country)) return "USD";
+        if ("GB".equals(country) || "UK".equals(country)) return "GBP";
+        if ("CA".equals(country)) return "CAD";
+        if ("AU".equals(country)) return "AUD";
+        if ("IN".equals(country)) return "INR";
+        if ("JP".equals(country)) return "JPY";
+        if ("DE".equals(country) || "ES".equals(country) || "FR".equals(country)
+                || "PT".equals(country) || "IT".equals(country) || "NL".equals(country)
+                || "BE".equals(country) || "AT".equals(country) || "IE".equals(country)
+                || "FI".equals(country) || "GR".equals(country)) {
+            return "EUR";
+        }
+        return getCurrency();
+    }
+
+    private Spinner setupSpinner(String[] labels) {
+        Spinner spinner = new Spinner(this);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, labels);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setBackground(round(COLOR_SURFACE_LOW, dp(12), COLOR_LINE));
+        spinner.setPadding(dp(10), 0, dp(10), 0);
+        return spinner;
+    }
+
+    private int indexOf(String[] values, String value, int fallback) {
         for (int i = 0; i < values.length; i++) {
-            if (values[i].equalsIgnoreCase(current)) {
-                checked = i;
-                break;
+            if (values[i].equalsIgnoreCase(value)) {
+                return i;
             }
         }
-
-        final int[] selected = {checked};
-        new AlertDialog.Builder(this)
-                .setTitle(ui("Ülke seçimi", "Select country"))
-                .setMessage(ui("İlk kullanım için ülkeni seç. Türkiye dışındaysa uygulama dili otomatik İngilizce olur.",
-                        "Choose your country for first use. If it is outside Turkey, the app language will switch to English automatically."))
-                .setSingleChoiceItems(labels, checked, (dialog, which) -> selected[0] = which)
-                .setCancelable(false)
-                .setPositiveButton(ui("Devam et", "Continue"), (dialog, which) -> {
-                    String countryCode = values[selected[0]];
-                    String languageCode = "TR".equals(countryCode) ? "tr" : "en";
-                    prefs.edit()
-                            .putString(KEY_COUNTRY, countryCode)
-                            .putString(KEY_LANGUAGE, languageCode)
-                            .putBoolean(KEY_COUNTRY_PROMPT_COMPLETED, true)
-                            .apply();
-                    recreate();
-                })
-                .show();
+        return fallback;
     }
 
     private List<String> buildSmartInsights() {
@@ -705,6 +1015,8 @@ public class MainActivity extends Activity {
         ImageView logo = new ImageView(this);
         logo.setImageResource(getResources().getIdentifier("ic_abonelik_logo_png", "drawable", getPackageName()));
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        logo.setBackgroundColor(Color.TRANSPARENT);
+        logo.setPadding(0, 0, 0, 0);
         return logo;
     }
 
@@ -835,12 +1147,7 @@ public class MainActivity extends Activity {
     private View centeredLogo(int width, int height) {
         LinearLayout wrap = new LinearLayout(this);
         wrap.setGravity(Gravity.CENTER);
-        ImageView logo = new ImageView(this);
-        logo.setImageResource(getResources().getIdentifier("abonelik_logo_full", "drawable", getPackageName()));
-        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        logo.setBackground(round(COLOR_SURFACE, dp(10), 0));
-        logo.setPadding(dp(8), dp(8), dp(8), dp(8));
-        wrap.addView(logo, new LinearLayout.LayoutParams(width, height));
+        wrap.addView(appMarkIcon(), new LinearLayout.LayoutParams(width, height));
         return wrap;
     }
 
@@ -944,13 +1251,24 @@ public class MainActivity extends Activity {
             }
             if (firebaseAuth.getCurrentUser() != null) {
                 finishFirebaseLogin(firebaseAuth.getCurrentUser(), false);
+            } else {
+                clearStaleLocalSession();
             }
         } catch (Throwable e) {
             firebaseAuth = null;
             firestore = null;
             storage = null;
+            clearStaleLocalSession();
             Toast.makeText(this, ui("Bulut girişi geçici olarak kapalı. Uygulama yerel modda açılıyor.", "Cloud sign-in is temporarily unavailable. The app is opening in local mode."), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void clearStaleLocalSession() {
+        getSharedPreferences(PREFS, MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_LOGGED_IN, false)
+                .remove(KEY_USER_EMAIL)
+                .apply();
     }
 
     private void completeLogin() {
@@ -972,6 +1290,7 @@ public class MainActivity extends Activity {
         editor.apply();
         migrateLegacyProfileIfNeeded();
         loadItems();
+        requestNotificationPermissionIfNeeded();
         scheduleReminders();
         screenHistory.clear();
         content.setPadding(dp(16), dp(8), dp(16), dp(104));
@@ -1181,7 +1500,7 @@ public class MainActivity extends Activity {
             content.addView(categoryCard(category, money(totals.get(category)), count + ui(" kayıt", " records")));
         }
         if (selectedCategoryDetail != null && totals.containsKey(selectedCategoryDetail)) {
-            content.addView(sectionTitle(selectedCategoryDetail + " Detayı"));
+            content.addView(sectionTitle(localizedCategory(selectedCategoryDetail) + ui(" Detayı", " Detail")));
             List<ExpenseItem> categoryItems = new ArrayList<>();
             for (ExpenseItem item : items) {
                 if (selectedCategoryDetail.equals(item.category) && itemOccursInMonth(item, selectedReportMonth)) {
@@ -1441,6 +1760,7 @@ public class MainActivity extends Activity {
         ));
         content.addView(settingsGroup(ui("Tercihler", "Preferences"),
                 settingRow(ui("Para Birimi", "Currency"), getCurrency(), "₺", v -> showCurrencyDialog()),
+                settingRow(ui("Ülke", "Country"), currentCountryLabel(), "⌂", v -> showCountryLanguageSetupDialog()),
                 settingRow(ui("Tema", "Theme"), getThemeDisplayName(), "◐", v -> showThemeDialog()),
                 settingRow(ui("Dil", "Language"), getLanguageName(), "🌐", v -> showLanguageDialog())
         ));
@@ -1483,18 +1803,6 @@ public class MainActivity extends Activity {
             amount.setText(String.valueOf(editingItem.amount));
         }
 
-        LinearLayout infoCard = formCard();
-        infoCard.addView(formLabel(ui("Kayıt Adı", "Record Name")));
-        infoCard.addView(name, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
-        infoCard.addView(spacer(dp(18)));
-        infoCard.addView(formLabel(ui("Tutar", "Amount")));
-        infoCard.addView(amount, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
-        content.addView(infoCard);
-
-        if (editingItem == null) {
-            content.addView(popularServicesCard(name, amount));
-        }
-
         Spinner category = new Spinner(this);
         category.setAdapter(categoryAdapter());
         category.setSelection(categoryIndex(editingItem == null ? "Abonelik" : editingItem.category));
@@ -1530,6 +1838,18 @@ public class MainActivity extends Activity {
         categoryCard.addView(date, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
         content.addView(categoryCard);
 
+        View popularServices = popularServicesCard(name, amount);
+        popularServices.setVisibility((editingItem == null || "Abonelik".equals(editingItem.category)) ? View.VISIBLE : View.GONE);
+        content.addView(popularServices);
+
+        LinearLayout infoCard = formCard();
+        infoCard.addView(formLabel(ui("Kayıt Adı", "Record Name")));
+        infoCard.addView(name, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
+        infoCard.addView(spacer(dp(18)));
+        infoCard.addView(formLabel(ui("Tutar", "Amount")));
+        infoCard.addView(amount, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
+        content.addView(infoCard);
+
         CheckBox monthly = styledCheck(ui("Her ay tekrar eder", "Repeats monthly"), ui("Otomatik kayıt oluşturulur", "Creates automatic monthly records"));
         monthly.setChecked(editingItem == null || editingItem.monthly);
         TextView smartSuggestion = text(ui("Akıllı öneri: hizmet adını yazınca kategori ve tekrar seçimi otomatik önerilir.", "Smart suggestion: type a service name to auto-suggest category and repeat."),
@@ -1553,6 +1873,15 @@ public class MainActivity extends Activity {
                 category.setBackground(round(categoryTint(selectedCategory), dp(12), categoryTextColor(selectedCategory)));
                 if (editingItem == null || !firstSelection) {
                     monthly.setChecked(isRecurringCategory(selectedCategory));
+                }
+                if ("Abonelik".equals(selectedCategory)) {
+                    popularServices.setVisibility(View.VISIBLE);
+                } else {
+                    popularServices.setVisibility(View.GONE);
+                    if (editingItem == null) {
+                        name.setText(localizedCategory(selectedCategory));
+                        name.setSelection(name.getText().length());
+                    }
                 }
                 firstSelection = false;
             }
@@ -1660,61 +1989,60 @@ public class MainActivity extends Activity {
     private void showServicePlans(String service, EditText name, EditText amount) {
         String[] plans;
         double[] prices;
-        if ("Netflix".equals(service)) {
-            plans = isEnglish()
-                    ? new String[]{"Standard with ads - enter current price", "Standard - enter current price", "Premium - enter current price"}
-                    : new String[]{"Temel - 189,99 TL/ay", "Standart - 289,99 TL/ay", "Özel - 379,99 TL/ay"};
-            prices = isEnglish() ? new double[]{-1, -1, -1} : new double[]{189.99, 289.99, 379.99};
+        boolean turkey = "TR".equals(currentCountryCode());
+        if (turkey) {
+            if ("Netflix".equals(service)) {
+                plans = new String[]{"Temel - 189,99 TL/ay", "Standart - 289,99 TL/ay", "Özel - 379,99 TL/ay"};
+                prices = new double[]{189.99, 289.99, 379.99};
+            } else if ("Amazon Prime".equals(service)) {
+                plans = new String[]{"Prime Aylık - 69,90 TL/ay"};
+                prices = new double[]{69.90};
+            } else if ("Spotify".equals(service)) {
+                plans = new String[]{"Bireysel - 99 TL/ay", "Öğrenci - 55 TL/ay", "Duo - 135 TL/ay", "Aile - 165 TL/ay"};
+                prices = new double[]{99, 55, 135, 165};
+            } else if ("YouTube Premium".equals(service)) {
+                plans = new String[]{"Premium Lite - 79,99 TL/ay", "Bireysel - 119,99 TL/ay", "Öğrenci - 79,99 TL/ay", "Aile - 239,99 TL/ay"};
+                prices = new double[]{79.99, 119.99, 79.99, 239.99};
+            } else if ("Disney+".equals(service)) {
+                plans = new String[]{"Reklamlı - 249,90 TL/ay", "Reklamsız - 449,90 TL/ay"};
+                prices = new double[]{249.90, 449.90};
+            } else if ("Exxen".equals(service)) {
+                plans = new String[]{"7 gün deneme - 1 TL", "Aylık paket - güncel fiyatı gir"};
+                prices = new double[]{1, -1};
+            } else if ("GAİN".equals(service)) {
+                plans = new String[]{"İlk 3 ay kampanyası - 129 TL/ay", "Aylık paket - güncel fiyatı gir"};
+                prices = new double[]{129, -1};
+            } else if ("TOD".equals(service)) {
+                plans = new String[]{"Eğlence paketi - güncel fiyatı gir", "Spor paketi - güncel fiyatı gir"};
+                prices = new double[]{-1, -1};
+            } else if ("beIN CONNECT".equals(service)) {
+                plans = new String[]{"Yıldız Dolu - güncel fiyatı gir", "Spor paketi - güncel fiyatı gir"};
+                prices = new double[]{-1, -1};
+            } else {
+                plans = new String[]{localizedPlanLabel("Monthly plan"), localizedPlanLabel("Annual plan")};
+                prices = new double[]{-1, -1};
+            }
+        } else if ("Netflix".equals(service)) {
+            plans = new String[]{localizedPlanLabel("Standard with ads"), localizedPlanLabel("Standard"), localizedPlanLabel("Premium")};
+            prices = new double[]{-1, -1, -1};
         } else if ("Amazon Prime".equals(service)) {
-            plans = new String[]{isEnglish() ? "Prime Monthly - enter current price" : "Prime Aylık - 69,90 TL/ay"};
-            prices = new double[]{isEnglish() ? -1 : 69.90};
+            plans = new String[]{localizedPlanLabel("Prime Monthly")};
+            prices = new double[]{-1};
         } else if ("Spotify".equals(service)) {
-            plans = isEnglish()
-                    ? new String[]{"Individual - enter current price", "Student - enter current price", "Duo - enter current price", "Family - enter current price"}
-                    : new String[]{"Bireysel - 99 TL/ay", "Öğrenci - 55 TL/ay", "Duo - 135 TL/ay", "Aile - 165 TL/ay"};
-            prices = isEnglish() ? new double[]{-1, -1, -1, -1} : new double[]{99, 55, 135, 165};
+            plans = new String[]{localizedPlanLabel("Individual"), localizedPlanLabel("Student"), localizedPlanLabel("Duo"), localizedPlanLabel("Family")};
+            prices = new double[]{-1, -1, -1, -1};
         } else if ("YouTube Premium".equals(service)) {
-            plans = isEnglish()
-                    ? new String[]{"Individual - enter current price", "Student - enter current price", "Family - enter current price"}
-                    : new String[]{"Premium Lite - 79,99 TL/ay", "Bireysel - 119,99 TL/ay", "Öğrenci - 79,99 TL/ay", "Aile - 239,99 TL/ay"};
-            prices = isEnglish() ? new double[]{-1, -1, -1} : new double[]{79.99, 119.99, 79.99, 239.99};
+            plans = new String[]{localizedPlanLabel("Individual"), localizedPlanLabel("Student"), localizedPlanLabel("Family")};
+            prices = new double[]{-1, -1, -1};
         } else if ("Disney+".equals(service)) {
-            plans = isEnglish()
-                    ? new String[]{"With ads - enter current price", "Ad-free - enter current price"}
-                    : new String[]{"Reklamlı - 249,90 TL/ay", "Reklamsız - 449,90 TL/ay"};
-            prices = isEnglish() ? new double[]{-1, -1} : new double[]{249.90, 449.90};
-        } else if ("Hulu".equals(service) || "Paramount+".equals(service) || "Peacock".equals(service)
-                || "Apple TV+".equals(service) || "Crunchyroll".equals(service) || "BritBox".equals(service)
-                || "DAZN".equals(service) || "WOW".equals(service) || "RTL+".equals(service) || "Canal+".equals(service)
-                || "Max".equals(service) || "NOW".equals(service)) {
-            plans = new String[]{"Monthly plan - enter current price", "Annual plan - enter current price"};
+            plans = new String[]{localizedPlanLabel("With ads"), localizedPlanLabel("Ad-free")};
             prices = new double[]{-1, -1};
-        } else if ("Exxen".equals(service)) {
-            plans = isEnglish()
-                    ? new String[]{"7-day trial - enter current price", "Monthly plan - enter current price"}
-                    : new String[]{"7 gün deneme - 1 TL", "Aylık paket - güncel fiyatı gir"};
-            prices = new double[]{1, -1};
-        } else if ("GAİN".equals(service)) {
-            plans = isEnglish()
-                    ? new String[]{"First 3 months campaign - enter current price", "Monthly plan - enter current price"}
-                    : new String[]{"İlk 3 ay kampanyası - 129 TL/ay", "Aylık paket - güncel fiyatı gir"};
-            prices = new double[]{129, -1};
-        } else if ("TOD".equals(service)) {
-            plans = isEnglish()
-                    ? new String[]{"Entertainment plan - enter current price", "Sports plan - enter current price"}
-                    : new String[]{"Eğlence paketi - güncel fiyatı gir", "Spor paketi - güncel fiyatı gir"};
+        } else if ("TOD".equals(service) || "beIN CONNECT".equals(service)) {
+            plans = new String[]{localizedPlanLabel("Entertainment plan"), localizedPlanLabel("Sports plan")};
             prices = new double[]{-1, -1};
-        } else if ("beIN CONNECT".equals(service)) {
-            plans = isEnglish()
-                    ? new String[]{"Entertainment plan - enter current price", "Sports plan - enter current price"}
-                    : new String[]{"Yıldız Dolu - güncel fiyatı gir", "Spor paketi - güncel fiyatı gir"};
-            prices = new double[]{-1, -1};
-        } else if ("HBO Max".equals(service)) {
-            plans = new String[]{ui("Aylık paket - güncel fiyatı gir", "Monthly plan - enter current price")};
-            prices = new double[]{-1};
         } else {
-            plans = new String[]{ui("tabii Premium aylık - güncel fiyatı gir", "tabii Premium monthly - enter current price")};
-            prices = new double[]{-1};
+            plans = new String[]{localizedPlanLabel("Monthly plan"), localizedPlanLabel("Annual plan")};
+            prices = new double[]{-1, -1};
         }
         new AlertDialog.Builder(this)
                 .setTitle(service + " " + ui("paketleri", "plans"))
@@ -1737,6 +2065,83 @@ public class MainActivity extends Activity {
                 .show();
     }
 
+    private String localizedPlanLabel(String plan) {
+        return uiPlan(plan) + " - " + ui("güncel fiyatı gir", "enter current price");
+    }
+
+    private String uiPlan(String plan) {
+        String language = getLanguageCode();
+        if ("tr".equals(language)) {
+            if ("Standard with ads".equals(plan)) return "Reklamlı standart";
+            if ("Standard".equals(plan)) return "Standart";
+            if ("Premium".equals(plan)) return "Premium";
+            if ("Prime Monthly".equals(plan)) return "Prime Aylık";
+            if ("Individual".equals(plan)) return "Bireysel";
+            if ("Student".equals(plan)) return "Öğrenci";
+            if ("Duo".equals(plan)) return "Duo";
+            if ("Family".equals(plan)) return "Aile";
+            if ("With ads".equals(plan)) return "Reklamlı";
+            if ("Ad-free".equals(plan)) return "Reklamsız";
+            if ("Entertainment plan".equals(plan)) return "Eğlence paketi";
+            if ("Sports plan".equals(plan)) return "Spor paketi";
+            if ("Annual plan".equals(plan)) return "Yıllık paket";
+            return "Aylık paket";
+        }
+        if ("es".equals(language)) {
+            if ("Standard with ads".equals(plan)) return "Estándar con anuncios";
+            if ("Standard".equals(plan)) return "Estándar";
+            if ("Premium".equals(plan)) return "Premium";
+            if ("Prime Monthly".equals(plan)) return "Prime mensual";
+            if ("Individual".equals(plan)) return "Individual";
+            if ("Student".equals(plan)) return "Estudiante";
+            if ("Duo".equals(plan)) return "Duo";
+            if ("Family".equals(plan)) return "Familiar";
+            if ("With ads".equals(plan)) return "Con anuncios";
+            if ("Ad-free".equals(plan)) return "Sin anuncios";
+            if ("Entertainment plan".equals(plan)) return "Plan de entretenimiento";
+            if ("Sports plan".equals(plan)) return "Plan deportivo";
+            if ("Annual plan".equals(plan)) return "Plan anual";
+            return "Plan mensual";
+        }
+        if ("de".equals(language)) {
+            if ("Standard with ads".equals(plan)) return "Standard mit Werbung";
+            if ("Student".equals(plan)) return "Student";
+            if ("Family".equals(plan)) return "Familie";
+            if ("With ads".equals(plan)) return "Mit Werbung";
+            if ("Ad-free".equals(plan)) return "Werbefrei";
+            if ("Entertainment plan".equals(plan)) return "Entertainment-Tarif";
+            if ("Sports plan".equals(plan)) return "Sport-Tarif";
+            if ("Annual plan".equals(plan)) return "Jahrestarif";
+            if ("Monthly plan".equals(plan)) return "Monatstarif";
+            return plan;
+        }
+        if ("fr".equals(language)) {
+            if ("Standard with ads".equals(plan)) return "Standard avec pubs";
+            if ("Student".equals(plan)) return "Étudiant";
+            if ("Family".equals(plan)) return "Famille";
+            if ("With ads".equals(plan)) return "Avec pubs";
+            if ("Ad-free".equals(plan)) return "Sans pubs";
+            if ("Entertainment plan".equals(plan)) return "Formule divertissement";
+            if ("Sports plan".equals(plan)) return "Formule sport";
+            if ("Annual plan".equals(plan)) return "Formule annuelle";
+            if ("Monthly plan".equals(plan)) return "Formule mensuelle";
+            return plan;
+        }
+        if ("pt".equals(language)) {
+            if ("Standard with ads".equals(plan)) return "Padrão com anúncios";
+            if ("Standard".equals(plan)) return "Padrão";
+            if ("Student".equals(plan)) return "Estudante";
+            if ("Family".equals(plan)) return "Família";
+            if ("With ads".equals(plan)) return "Com anúncios";
+            if ("Ad-free".equals(plan)) return "Sem anúncios";
+            if ("Entertainment plan".equals(plan)) return "Plano de entretenimento";
+            if ("Sports plan".equals(plan)) return "Plano esportivo";
+            if ("Annual plan".equals(plan)) return "Plano anual";
+            if ("Monthly plan".equals(plan)) return "Plano mensal";
+            return plan;
+        }
+        return plan;
+    }
     private String[] popularServicesForCountry() {
         String country = currentCountryCode();
         if ("US".equals(country)) {
@@ -1750,6 +2155,27 @@ public class MainActivity extends Activity {
         }
         if ("FR".equals(country)) {
             return new String[]{"Netflix", "Amazon Prime", "Disney+", "Spotify", "YouTube Premium", "Apple TV+", "Canal+", "Paramount+", "DAZN"};
+        }
+        if ("ES".equals(country)) {
+            return new String[]{"Netflix", "Amazon Prime", "Disney+", "Spotify", "YouTube Premium", "Apple TV+", "Max", "DAZN", "Paramount+"};
+        }
+        if ("PT".equals(country)) {
+            return new String[]{"Netflix", "Amazon Prime", "Disney+", "Spotify", "YouTube Premium", "Apple TV+", "Max", "DAZN", "SkyShowtime"};
+        }
+        if ("BR".equals(country)) {
+            return new String[]{"Netflix", "Amazon Prime", "Disney+", "Spotify", "YouTube Premium", "Apple TV+", "Max", "Paramount+", "Globoplay"};
+        }
+        if ("CA".equals(country)) {
+            return new String[]{"Netflix", "Amazon Prime", "Disney+", "Spotify", "YouTube Premium", "Apple TV+", "Crave", "Paramount+", "Crunchyroll"};
+        }
+        if ("AU".equals(country)) {
+            return new String[]{"Netflix", "Amazon Prime", "Disney+", "Spotify", "YouTube Premium", "Apple TV+", "Stan", "Paramount+", "Binge"};
+        }
+        if ("IN".equals(country)) {
+            return new String[]{"Netflix", "Amazon Prime", "Disney+", "Spotify", "YouTube Premium", "Apple TV+", "JioHotstar", "SonyLIV", "ZEE5"};
+        }
+        if ("JP".equals(country)) {
+            return new String[]{"Netflix", "Amazon Prime", "Disney+", "Spotify", "YouTube Premium", "Apple TV+", "U-NEXT", "Hulu", "DAZN"};
         }
         return new String[]{
                 "Netflix", "Amazon Prime", "Spotify", "YouTube Premium", "Disney+",
@@ -1814,7 +2240,7 @@ public class MainActivity extends Activity {
         campaignList.setOrientation(LinearLayout.VERTICAL);
         String cached = getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_CAMPAIGN_CACHE, "");
         if (!renderCampaignFeed(campaignList, cached, false)) {
-            renderFallbackCampaigns(campaignList, false);
+            renderFallbackCampaignsForCountry(campaignList, false);
         }
         content.addView(campaignList);
         loadRemoteCampaigns(campaignList, false);
@@ -1825,7 +2251,11 @@ public class MainActivity extends Activity {
         content.addView(note);
     }
 
-    private void renderFallbackCampaigns(LinearLayout target, boolean compact) {
+    private void renderFallbackCampaignsForCountry(LinearLayout target, boolean compact) {
+        if (!"TR".equals(currentCountryCode())) {
+            target.removeAllViews();
+            return;
+        }
         target.addView(campaignCard(ui("İş Bankası kartlarına 6–12 ay Amazon Prime", "6–12 months Amazon Prime with İş Bank cards"), ui("6 veya 12 ay ücretsiz", "6 or 12 months free"),
                 ui("Amazon Prime • Kart türüne göre üyelik süresi değişir.", "Amazon Prime • Membership duration varies by card type."), ui("30 Nisan 2027'ye kadar", "Until April 30, 2027"),
                 "https://www.maximum.com.tr/kampanyalar/12-aya-varan-amazon-prime-uyeligi", compact));
@@ -1860,11 +2290,15 @@ public class MainActivity extends Activity {
                 ordered.add(campaigns.getJSONObject(i));
             }
             Collections.sort(ordered, (a, b) -> campaignMatchScore(b) - campaignMatchScore(a));
+            int added = 0;
             for (int i = 0; i < ordered.size(); i++) {
                 JSONObject item = ordered.get(i);
                 String status = item.optString("status", "active");
                 boolean expired = "expired".equals(status);
                 if (expired) {
+                    continue;
+                }
+                if (!campaignMatchesCountry(item)) {
                     continue;
                 }
                 JSONArray serviceArray = item.optJSONArray("services");
@@ -1894,14 +2328,66 @@ public class MainActivity extends Activity {
                         item.optString("sourceUrl", ""),
                         compact
                 ));
+                added++;
             }
-            return true;
+            return added > 0;
         } catch (Exception ignored) {
             return false;
         }
     }
 
+    private boolean campaignMatchesCountry(JSONObject item) {
+        String country = currentCountryCode();
+        String countries = campaignCountryText(item);
+        if (countries.trim().isEmpty()) {
+            return "TR".equals(country);
+        }
+        String normalized = countries.toUpperCase(Locale.US);
+        if (normalized.contains("GLOBAL") || normalized.contains("WORLD") || normalized.contains("ALL")) {
+            return true;
+        }
+        if (normalized.contains(country)) {
+            return true;
+        }
+        return isEuropeanCountry(country) && (normalized.contains("EU") || normalized.contains("EUROPE") || normalized.contains("EUROPA"));
+    }
+
+    private String campaignCountryText(JSONObject item) {
+        StringBuilder builder = new StringBuilder();
+        appendCampaignCountryField(builder, item, "country");
+        appendCampaignCountryField(builder, item, "countries");
+        appendCampaignCountryField(builder, item, "region");
+        appendCampaignCountryField(builder, item, "regions");
+        appendCampaignCountryField(builder, item, "market");
+        appendCampaignCountryField(builder, item, "markets");
+        appendCampaignCountryField(builder, item, "locale");
+        appendCampaignCountryField(builder, item, "locales");
+        return builder.toString();
+    }
+
+    private void appendCampaignCountryField(StringBuilder builder, JSONObject item, String key) {
+        JSONArray array = item.optJSONArray(key);
+        if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+                builder.append(' ').append(array.optString(i));
+            }
+            return;
+        }
+        builder.append(' ').append(item.optString(key, ""));
+    }
+
+    private boolean isEuropeanCountry(String country) {
+        return "DE".equals(country) || "ES".equals(country) || "FR".equals(country)
+                || "PT".equals(country) || "IT".equals(country) || "NL".equals(country)
+                || "BE".equals(country) || "AT".equals(country) || "IE".equals(country)
+                || "FI".equals(country) || "GR".equals(country);
+    }
+
     private void loadRemoteCampaigns(LinearLayout target, boolean compact) {
+        loadRemoteCampaigns(target, compact, null);
+    }
+
+    private void loadRemoteCampaigns(LinearLayout target, boolean compact, View container) {
         new Thread(() -> {
             HttpURLConnection connection = null;
             try {
@@ -1921,7 +2407,12 @@ public class MainActivity extends Activity {
                 getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_CAMPAIGN_CACHE, json).apply();
                 runOnUiThread(() -> {
                     if (currentScreen == SCREEN_CAMPAIGNS || currentScreen == SCREEN_HOME) {
-                        renderCampaignFeed(target, json, compact);
+                        if (!renderCampaignFeed(target, json, compact)) {
+                            renderFallbackCampaignsForCountry(target, compact);
+                        }
+                        if (container != null) {
+                            container.setVisibility(target.getChildCount() == 0 ? View.GONE : View.VISIBLE);
+                        }
                     }
                 });
             } catch (Exception ignored) {
@@ -1975,7 +2466,7 @@ public class MainActivity extends Activity {
         serviceView.setMaxLines(2);
         serviceView.setPadding(0, dp(5), 0, dp(8));
         card.addView(serviceView);
-        TextView action = text("Detaylar", 11, Color.WHITE, Typeface.BOLD);
+        TextView action = text(ui("Detaylar", "Details"), 11, Color.WHITE, Typeface.BOLD);
         action.setGravity(Gravity.CENTER);
         action.setBackground(round(expired ? COLOR_MUTED : Color.rgb(35, 145, 154), dp(5), Color.argb(100, 255, 255, 255)));
         card.addView(action, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(30)));
@@ -2176,7 +2667,7 @@ public class MainActivity extends Activity {
     }
 
     private void showCurrencyDialog() {
-        String[] values = {"TL", "USD", "EUR", "GBP"};
+        String[] values = CURRENCY_OPTIONS;
         int checked = Math.max(0, java.util.Arrays.asList(values).indexOf(getCurrency()));
         new AlertDialog.Builder(this)
                 .setTitle(ui("Para Birimi", "Currency"))
@@ -2205,9 +2696,9 @@ public class MainActivity extends Activity {
     }
 
     private void showLanguageDialog() {
-        String[] labels = {"Türkçe", "English"};
-        String[] values = {"tr", "en"};
-        int checked = "en".equals(getLanguageCode()) ? 1 : 0;
+        String[] labels = {"English", "Türkçe", "Deutsch", "Español", "Français", "Português"};
+        String[] values = {"en", "tr", "de", "es", "fr", "pt"};
+        int checked = Math.max(0, java.util.Arrays.asList(values).indexOf(getLanguageCode()));
         new AlertDialog.Builder(this)
                 .setTitle(ui("Dil", "Language"))
                 .setSingleChoiceItems(labels, checked, (dialog, which) -> {
@@ -2310,9 +2801,9 @@ public class MainActivity extends Activity {
         double paid = 0;
         double upcomingAmount = 0;
         int upcomingCount = 0;
-        Map<String, Double> categoryTotals = new HashMap<>();
         List<ExpenseItem> monthItems = new ArrayList<>();
         List<ExpenseItem> upcoming = new ArrayList<>();
+        Map<Long, Boolean> upcomingIds = new HashMap<>();
 
         for (ExpenseItem item : items) {
             Calendar due = item.dueDateForMonth(now);
@@ -2324,15 +2815,18 @@ public class MainActivity extends Activity {
                 if (item.isPaidFor(currentYear, currentMonth)) {
                     paid += monthAmount;
                 }
-                categoryTotals.put(item.category, categoryTotals.getOrDefault(item.category, 0.0) + monthAmount);
                 monthItems.add(item);
             }
-            due = item.nextReminderDate(now);
+
+            due = item.dueDateForMonth(now);
             long days = daysBetween(now, due);
-            if (!item.isPaidFor(due.get(Calendar.YEAR), due.get(Calendar.MONTH)) && days >= 0 && days <= 7) {
+            boolean unpaidCurrentDue = !item.isPaidFor(due.get(Calendar.YEAR), due.get(Calendar.MONTH));
+            boolean overdueOrSoon = unpaidCurrentDue && days <= 7;
+            if (overdueOrSoon) {
                 upcomingCount++;
                 upcomingAmount += item.amountForMonth(due.get(Calendar.YEAR), due.get(Calendar.MONTH));
                 upcoming.add(item);
+                upcomingIds.put(item.id, true);
             }
         }
 
@@ -2342,21 +2836,27 @@ public class MainActivity extends Activity {
         upcomingText.setText(money(remaining));
 
         renderUpcoming(upcoming, now);
-        renderCategories(categoryTotals);
-        renderAll(monthItems, now);
+        renderAll(monthItems, now, upcomingIds);
     }
 
     private void renderUpcoming(List<ExpenseItem> upcoming, Calendar now) {
         upcomingList.removeAllViews();
-        Collections.sort(upcoming, Comparator.comparingLong(item -> item.nextReminderDate(now).getTimeInMillis()));
+        Collections.sort(upcoming, Comparator.comparingLong(item -> item.dueDateForMonth(now).getTimeInMillis()));
         if (upcoming.isEmpty()) {
             upcomingList.addView(emptyText(ui("Önümüzdeki 7 gün için bekleyen ödeme yok.", "No pending payment for the next 7 days.")));
             return;
         }
         for (ExpenseItem item : upcoming) {
-            Calendar due = item.nextReminderDate(now);
+            Calendar due = item.dueDateForMonth(now);
             long days = daysBetween(now, due);
-            String trailing = days == 0 ? ui("Bugün", "Today") : days + ui(" gün kaldı", " days left");
+            String trailing;
+            if (days < 0) {
+                trailing = formatDate(due);
+            } else if (days == 0) {
+                trailing = ui("Bugün", "Today");
+            } else {
+                trailing = days + ui(" gün kaldı", " days left");
+            }
             upcomingList.addView(itemRow(item, due, trailing));
         }
     }
@@ -2380,14 +2880,20 @@ public class MainActivity extends Activity {
         categoryList.addView(scroll);
     }
 
-    private void renderAll(List<ExpenseItem> monthItems, Calendar now) {
+    private void renderAll(List<ExpenseItem> monthItems, Calendar now, Map<Long, Boolean> excludedIds) {
         allItemsList.removeAllViews();
-        Collections.sort(monthItems, Comparator.comparingLong(item -> item.dueDateForMonth(now).getTimeInMillis()));
-        if (monthItems.isEmpty()) {
-            allItemsList.addView(emptyText(ui("Bu ay için kayıt yok. İlk abonelik veya giderini ekleyebilirsin.", "No records this month. Add your first subscription or expense.")));
+        List<ExpenseItem> visibleItems = new ArrayList<>();
+        for (ExpenseItem item : monthItems) {
+            if (!excludedIds.containsKey(item.id)) {
+                visibleItems.add(item);
+            }
+        }
+        Collections.sort(visibleItems, Comparator.comparingLong(item -> item.dueDateForMonth(now).getTimeInMillis()));
+        if (visibleItems.isEmpty()) {
+            allItemsList.addView(emptyText(ui("Bu ay için diğer kayıt yok.", "No other records this month.")));
             return;
         }
-        for (ExpenseItem item : monthItems) {
+        for (ExpenseItem item : visibleItems) {
             Calendar due = item.dueDateForMonth(now);
             String trailing = item.isPaidFor(due.get(Calendar.YEAR), due.get(Calendar.MONTH)) ? ui("Ödendi", "Paid") : formatDate(due);
             allItemsList.addView(itemRow(item, due, trailing));
@@ -2405,7 +2911,7 @@ public class MainActivity extends Activity {
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
 
-        TextView icon = iconBox(categoryIcon(item.category), categoryTint(item.category), categoryTextColor(item.category));
+        View icon = recordIcon(item);
         LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(44), dp(44));
         iconParams.setMargins(0, 0, dp(14), 0);
         top.addView(icon, iconParams);
@@ -2436,9 +2942,16 @@ public class MainActivity extends Activity {
         LinearLayout buttons = new LinearLayout(this);
         buttons.setOrientation(LinearLayout.HORIZONTAL);
         buttons.setPadding(0, dp(10), 0, 0);
-        Button paidButton = smallButton(paidForThisDate ? ui("Bekliyor yap", "Mark pending") : ui("Ödendi", "Paid"));
-        Button editButton = smallButton(ui("Düzenle", "Edit"));
-        Button deleteButton = smallButton(ui("Sil", "Delete"));
+        View paidButton = smallActionButton(
+                paidForThisDate ? ui("Ödenmedi Yap", "Mark Unpaid") : ui("Ödendi Yap", "Mark Paid"),
+                R.drawable.ic_action_card,
+                paidForThisDate ? COLOR_SURFACE_LOW : Color.rgb(28, 142, 79),
+                paidForThisDate ? COLOR_PRIMARY : Color.WHITE
+        );
+        View editButton = smallActionButton("", R.drawable.ic_action_edit);
+        editButton.setContentDescription(ui("Düzenle", "Edit"));
+        View deleteButton = smallActionButton("", R.drawable.ic_action_delete);
+        deleteButton.setContentDescription(ui("Sil", "Delete"));
         paidButton.setOnClickListener(v -> {
             if (item.isPaidFor(due.get(Calendar.YEAR), due.get(Calendar.MONTH))) {
                 item.removeActualPayment(due.get(Calendar.YEAR), due.get(Calendar.MONTH));
@@ -2454,11 +2967,11 @@ public class MainActivity extends Activity {
         });
         editButton.setOnClickListener(v -> openRecordScreen(item));
         deleteButton.setOnClickListener(v -> confirmDelete(item));
-        buttons.addView(paidButton, new LinearLayout.LayoutParams(0, dp(40), 1));
-        LinearLayout.LayoutParams editParams = new LinearLayout.LayoutParams(0, dp(40), 1);
+        buttons.addView(paidButton, new LinearLayout.LayoutParams(0, dp(40), 2.0f));
+        LinearLayout.LayoutParams editParams = new LinearLayout.LayoutParams(0, dp(40), 0.45f);
         editParams.setMargins(dp(8), 0, 0, 0);
         buttons.addView(editButton, editParams);
-        LinearLayout.LayoutParams deleteParams = new LinearLayout.LayoutParams(0, dp(40), 1);
+        LinearLayout.LayoutParams deleteParams = new LinearLayout.LayoutParams(0, dp(40), 0.45f);
         deleteParams.setMargins(dp(8), 0, 0, 0);
         buttons.addView(deleteButton, deleteParams);
         row.addView(buttons);
@@ -2470,6 +2983,37 @@ public class MainActivity extends Activity {
         params.setMargins(0, 0, 0, dp(10));
         row.setLayoutParams(params);
         return row;
+    }
+
+    private View smallActionButton(String label, int iconRes) {
+        return smallActionButton(label, iconRes, COLOR_SURFACE_LOW, COLOR_PRIMARY);
+    }
+
+    private View smallActionButton(String label, int iconRes, int backgroundColor, int foregroundColor) {
+        LinearLayout button = new LinearLayout(this);
+        button.setOrientation(LinearLayout.HORIZONTAL);
+        button.setGravity(Gravity.CENTER);
+        button.setPadding(dp(8), 0, dp(8), 0);
+        button.setBackground(round(backgroundColor, dp(8), 0));
+        button.setClickable(true);
+        button.setFocusable(true);
+
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(iconRes);
+        Drawable drawable = icon.getDrawable();
+        if (drawable != null) {
+            drawable.setTint(foregroundColor);
+        }
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(16), dp(16));
+        iconParams.setMargins(0, 0, label == null || label.isEmpty() ? 0 : dp(6), 0);
+        button.addView(icon, iconParams);
+
+        if (label != null && !label.isEmpty()) {
+            TextView text = text(label, 11, foregroundColor, Typeface.BOLD);
+            text.setSingleLine(true);
+            button.addView(text, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+        return button;
     }
 
     private void showActualAmountDialog(ExpenseItem item, Calendar due) {
@@ -2683,7 +3227,14 @@ public class MainActivity extends Activity {
     }
 
     private double parseLocalizedAmount(String value) throws NumberFormatException {
-        String clean = value.trim().replace("₺", "").replace("€", "").replace("$", "").replace("£", "").replace(" ", "");
+        String clean = value.trim()
+                .replace("₺", "")
+                .replace("€", "")
+                .replace("$", "")
+                .replace("£", "")
+                .replace("₹", "")
+                .replace("¥", "")
+                .replace(" ", "");
         if (clean.contains(",")) {
             clean = clean.replace(".", "").replace(',', '.');
         }
@@ -2880,6 +3431,61 @@ public class MainActivity extends Activity {
         scheduleReminders();
     }
 
+    private String reminderTitle(ExpenseItem item, Calendar due, double amount) {
+        long days = daysBetween(Calendar.getInstance(), due);
+        if (days == 1) {
+            return item.name + reminderRenewsTomorrowText();
+        }
+        if (days == 0) {
+            return item.name + reminderRenewsTodayText();
+        }
+        return item.name + ui(" ödeme zamanı", " payment reminder");
+    }
+
+    private String reminderMessage(ExpenseItem item, Calendar due, double amount) {
+        long days = daysBetween(Calendar.getInstance(), due);
+        String price = money(amount);
+        String language = getLanguageCode();
+        if (days == 1) {
+            if ("tr".equals(language)) return "Yarın " + price + " ödeyeceksin.";
+            if ("de".equals(language)) return "Du zahlst morgen " + price + ".";
+            if ("es".equals(language)) return "Pagarás " + price + " mañana.";
+            if ("fr".equals(language)) return "Vous paierez " + price + " demain.";
+            if ("pt".equals(language)) return "Você pagará " + price + " amanhã.";
+            return "You'll pay " + price + " tomorrow.";
+        }
+        if (days == 0) {
+            if ("tr".equals(language)) return "Bugün " + price + " ödeme var.";
+            if ("de".equals(language)) return "Du zahlst heute " + price + ".";
+            if ("es".equals(language)) return "Pagarás " + price + " hoy.";
+            if ("fr".equals(language)) return "Vous paierez " + price + " aujourd'hui.";
+            if ("pt".equals(language)) return "Você pagará " + price + " hoje.";
+            return "You'll pay " + price + " today.";
+        }
+        return formatDate(due) + ui(" tarihinde ", " has ")
+                + price + ui(" ödeme var.", " payment due.");
+    }
+
+    private String reminderRenewsTomorrowText() {
+        String language = getLanguageCode();
+        if ("tr".equals(language)) return " yarın yenileniyor.";
+        if ("de".equals(language)) return " verlängert sich morgen.";
+        if ("es".equals(language)) return " se renueva mañana.";
+        if ("fr".equals(language)) return " se renouvelle demain.";
+        if ("pt".equals(language)) return " renova amanhã.";
+        return " renews tomorrow.";
+    }
+
+    private String reminderRenewsTodayText() {
+        String language = getLanguageCode();
+        if ("tr".equals(language)) return " bugün yenileniyor.";
+        if ("de".equals(language)) return " verlängert sich heute.";
+        if ("es".equals(language)) return " se renueva hoy.";
+        if ("fr".equals(language)) return " se renouvelle aujourd'hui.";
+        if ("pt".equals(language)) return " renova hoje.";
+        return " renews today.";
+    }
+
     private void scheduleReminders() {
         cancelScheduledReminders();
         if (!notificationsEnabled()) {
@@ -2911,11 +3517,10 @@ public class MainActivity extends Activity {
             if (remindAt.before(now)) {
                 continue;
             }
+            double amount = item.amountForMonth(due.get(Calendar.YEAR), due.get(Calendar.MONTH));
             Intent intent = new Intent(this, PaymentReminderReceiver.class);
-            intent.putExtra(PaymentReminderReceiver.EXTRA_TITLE, item.name + ui(" ödeme zamanı", " payment time"));
-            intent.putExtra(PaymentReminderReceiver.EXTRA_MESSAGE,
-                    formatDate(due) + ui(" tarihinde ", " has ")
-                            + money(item.amountForMonth(due.get(Calendar.YEAR), due.get(Calendar.MONTH))) + ui(" ödeme var.", " payment due."));
+            intent.putExtra(PaymentReminderReceiver.EXTRA_TITLE, reminderTitle(item, due, amount));
+            intent.putExtra(PaymentReminderReceiver.EXTRA_MESSAGE, reminderMessage(item, due, amount));
             PendingIntent pendingIntent = PendingIntent.getBroadcast(
                     this,
                     (int) item.id,
@@ -2980,6 +3585,7 @@ public class MainActivity extends Activity {
             backup.put("user_name", getUserName());
             backup.put("user_email", getUserEmail());
             backup.put("currency", getCurrency());
+            backup.put("country", currentCountryCode());
             backup.put("theme", getThemeName());
             backup.put("language", getLanguageCode());
             backup.put("notifications", notificationsEnabled());
@@ -3046,15 +3652,23 @@ public class MainActivity extends Activity {
         if (isEmptyItemsJson(cloudItemsJson) && !items.isEmpty()) {
             cloudItemsJson = itemsJson();
         }
+        String signedInEmail = firebaseAuth != null
+                && firebaseAuth.getCurrentUser() != null
+                && firebaseAuth.getCurrentUser().getEmail() != null
+                ? firebaseAuth.getCurrentUser().getEmail()
+                : getUserEmail();
         applyingCloudData = true;
         SharedPreferences.Editor editor = getSharedPreferences(PREFS, MODE_PRIVATE).edit()
                 .putString(currentItemsKey(), cloudItemsJson)
                 .putString(KEY_USER_NAME, backup.optString("user_name", getUserName()))
-                .putString(KEY_USER_EMAIL, backup.optString("user_email", getUserEmail()))
+                .putString(KEY_USER_EMAIL, signedInEmail)
                 .putString(KEY_CURRENCY, backup.optString("currency", getCurrency()))
+                .putString(KEY_COUNTRY, backup.optString("country", currentCountryCode()))
                 .putString(KEY_THEME, backup.optString("theme", getThemeName()))
                 .putString(KEY_LANGUAGE, backup.optString("language", getLanguageCode()))
                 .putBoolean(KEY_NOTIFICATIONS, backup.optBoolean("notifications", notificationsEnabled()))
+                .putBoolean(KEY_COUNTRY_PROMPT_COMPLETED, backup.has("country") && !backup.optString("country", "").trim().isEmpty())
+                .putBoolean(countryPromptCompletedKey(signedInEmail), backup.has("country") && !backup.optString("country", "").trim().isEmpty())
                 .putLong(KEY_LAST_CLOUD_SYNC, System.currentTimeMillis());
         editor.apply();
         applyThemeColors();
@@ -3179,6 +3793,7 @@ public class MainActivity extends Activity {
         data.put("user_name", getUserName());
         data.put("user_email", getUserEmail());
         data.put("currency", getCurrency());
+        data.put("country", currentCountryCode());
         data.put("theme", getThemeName());
         data.put("language", getLanguageCode());
         data.put("notifications", notificationsEnabled());
@@ -3204,6 +3819,10 @@ public class MainActivity extends Activity {
 
     private void cloudLoadFinished() {
         cloudLoadInProgress = false;
+        if (pendingCountryPromptAfterCloud) {
+            pendingCountryPromptAfterCloud = false;
+            ensureCountrySelectionPrompt();
+        }
     }
 
     private void loadFirestoreDataOrCreate() {
@@ -3319,7 +3938,7 @@ public class MainActivity extends Activity {
     private void loadEmailBackupsThenApply(DocumentSnapshot uidDoc, DocumentSnapshot uidBackupDoc) {
         String emailDoc = cloudEmailDocumentId();
         if (emailDoc.isEmpty()) {
-            applyBestFirestoreBackup(uidDoc, uidBackupDoc, null, null);
+            loadUserByEmailThenApply(uidDoc, uidBackupDoc, null, null);
             return;
         }
         DocumentReference emailRef = firestore.collection(CLOUD_EMAIL_BACKUPS).document(emailDoc);
@@ -3331,19 +3950,39 @@ public class MainActivity extends Activity {
                         .get()
                         .addOnSuccessListener(snapshot -> {
                             DocumentSnapshot emailBackupDoc = snapshot.isEmpty() ? null : snapshot.getDocuments().get(0);
-                            applyBestFirestoreBackup(uidDoc, uidBackupDoc, emailLatestDoc, emailBackupDoc);
+                            loadUserByEmailThenApply(uidDoc, uidBackupDoc, emailLatestDoc, emailBackupDoc);
                         })
-                        .addOnFailureListener(e -> applyBestFirestoreBackup(uidDoc, uidBackupDoc, emailLatestDoc, null)))
-                .addOnFailureListener(e -> applyBestFirestoreBackup(uidDoc, uidBackupDoc, null, null));
+                        .addOnFailureListener(e -> loadUserByEmailThenApply(uidDoc, uidBackupDoc, emailLatestDoc, null)))
+                .addOnFailureListener(e -> loadUserByEmailThenApply(uidDoc, uidBackupDoc, null, null));
+    }
+
+    private void loadUserByEmailThenApply(DocumentSnapshot uidDoc, DocumentSnapshot uidBackupDoc,
+                                          DocumentSnapshot emailDoc, DocumentSnapshot emailBackupDoc) {
+        String email = getUserEmail();
+        if (firestore == null || email == null || email.trim().isEmpty()) {
+            applyBestFirestoreBackup(uidDoc, uidBackupDoc, emailDoc, emailBackupDoc, null);
+            return;
+        }
+        firestore.collection(CLOUD_PRIMARY_USERS)
+                .whereEqualTo("user_email", email.trim())
+                .limit(1)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    DocumentSnapshot userByEmail = snapshot.isEmpty() ? null : snapshot.getDocuments().get(0);
+                    applyBestFirestoreBackup(uidDoc, uidBackupDoc, emailDoc, emailBackupDoc, userByEmail);
+                })
+                .addOnFailureListener(e -> applyBestFirestoreBackup(uidDoc, uidBackupDoc, emailDoc, emailBackupDoc, null));
     }
 
     private void applyBestFirestoreBackup(DocumentSnapshot uidDoc, DocumentSnapshot uidBackupDoc,
-                                          DocumentSnapshot emailDoc, DocumentSnapshot emailBackupDoc) {
+                                          DocumentSnapshot emailDoc, DocumentSnapshot emailBackupDoc,
+                                          DocumentSnapshot userByEmailDoc) {
         List<JSONObject> backups = new ArrayList<>();
         addBackupIfPresent(backups, backupFromFirestoreDoc(uidDoc));
         addBackupIfPresent(backups, backupFromFirestoreDoc(uidBackupDoc));
         addBackupIfPresent(backups, backupFromFirestoreDoc(emailDoc));
         addBackupIfPresent(backups, backupFromFirestoreDoc(emailBackupDoc));
+        addBackupIfPresent(backups, backupFromFirestoreDoc(userByEmailDoc));
         JSONObject selected = newestNonEmptyBackup(backups);
         if (selected == null && !backups.isEmpty()) {
             selected = backups.get(0);
@@ -3383,15 +4022,21 @@ public class MainActivity extends Activity {
     }
 
     private JSONObject backupFromFirestoreDoc(DocumentSnapshot doc) {
-        if (doc == null || !doc.exists() || doc.getString("items_json") == null) {
+        if (doc == null || !doc.exists()) {
+            return null;
+        }
+        String itemsJson = doc.getString("items_json");
+        String country = doc.getString("country");
+        if (itemsJson == null && (country == null || country.trim().isEmpty())) {
             return null;
         }
         JSONObject backup = new JSONObject();
         try {
-            backup.put("items_json", doc.getString("items_json"));
+            backup.put("items_json", itemsJson == null ? "[]" : itemsJson);
             backup.put("user_name", doc.getString("user_name") == null ? getUserName() : doc.getString("user_name"));
             backup.put("user_email", doc.getString("user_email") == null ? getUserEmail() : doc.getString("user_email"));
             backup.put("currency", doc.getString("currency") == null ? getCurrency() : doc.getString("currency"));
+            backup.put("country", country == null ? "" : country);
             backup.put("theme", doc.getString("theme") == null ? getThemeName() : doc.getString("theme"));
             backup.put("language", doc.getString("language") == null ? getLanguageCode() : doc.getString("language"));
             Boolean notifications = doc.getBoolean("notifications");
@@ -3503,11 +4148,12 @@ public class MainActivity extends Activity {
         if (firebaseAuth != null && firebaseAuth.getCurrentUser() != null && firebaseAuth.getCurrentUser().getEmail() != null) {
             return firebaseAuth.getCurrentUser().getEmail();
         }
-        return getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_USER_EMAIL, "kullanici@email.com");
+        return getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_USER_EMAIL, "");
     }
 
     private String getCurrency() {
-        return getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_CURRENCY, "TL");
+        String currency = getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_CURRENCY, "TRY");
+        return "TL".equals(currency) ? "TRY" : currency;
     }
 
     private String getThemeName() {
@@ -3526,8 +4172,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean isLoggedIn() {
-        return (firebaseAuth != null && firebaseAuth.getCurrentUser() != null)
-                || getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(KEY_LOGGED_IN, false);
+        return firebaseAuth != null && firebaseAuth.getCurrentUser() != null;
     }
 
     private String safeMessage(Exception e) {
@@ -3600,6 +4245,10 @@ public class MainActivity extends Activity {
         if ("USD".equals(currency)) return "$";
         if ("EUR".equals(currency)) return "€";
         if ("GBP".equals(currency)) return "£";
+        if ("CAD".equals(currency)) return "C$";
+        if ("AUD".equals(currency)) return "A$";
+        if ("INR".equals(currency)) return "₹";
+        if ("JPY".equals(currency)) return "¥";
         return "₺";
     }
 
@@ -3668,8 +4317,8 @@ public class MainActivity extends Activity {
         LinearLayout chips = new LinearLayout(this);
         chips.setOrientation(LinearLayout.HORIZONTAL);
         chips.setPadding(0, dp(16), 0, dp(22));
-        chips.addView(navChip("Tüm Kayıtlar (" + items.size() + ")", 0));
-        chips.addView(navChip("En Çok Harcanan", 1));
+        chips.addView(navChip(ui("Tüm Kayıtlar", "All Records") + " (" + items.size() + ")", 0));
+        chips.addView(navChip(ui("En Çok Harcanan", "Top Spending"), 1));
         scroll.addView(chips);
         return scroll;
     }
@@ -3942,7 +4591,7 @@ public class MainActivity extends Activity {
         row.setPadding(dp(16), dp(14), dp(16), dp(14));
         row.setBackground(cardBg());
         row.setElevation(dp(2));
-        TextView icon = iconBox(categoryIcon(item.category), categoryTint(item.category), categoryTextColor(item.category));
+        View icon = recordIcon(item);
         LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(44), dp(44));
         iconParams.setMargins(0, 0, dp(14), 0);
         row.addView(icon, iconParams);
@@ -3987,15 +4636,6 @@ public class MainActivity extends Activity {
         copy.setOrientation(LinearLayout.VERTICAL);
         copy.addView(text(getUserName(), 18, COLOR_TEXT, Typeface.BOLD));
         copy.addView(text(getUserEmail(), 14, COLOR_MUTED, Typeface.NORMAL));
-        TextView premium = text("Premium Üye", 12, COLOR_PRIMARY, Typeface.BOLD);
-        premium.setPadding(dp(8), dp(4), dp(8), dp(4));
-        premium.setBackground(round(Color.rgb(226, 244, 246), dp(100), 0));
-        LinearLayout.LayoutParams premiumParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        premiumParams.setMargins(0, dp(8), 0, 0);
-        copy.addView(premium, premiumParams);
         card.addView(copy, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         card.addView(text("›", 28, COLOR_MUTED, Typeface.BOLD));
 
@@ -4092,7 +4732,7 @@ public class MainActivity extends Activity {
                 view.setTextSize(16);
                 view.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
                 view.setPadding(dp(14), 0, dp(14), 0);
-                view.setBackgroundColor(COLOR_SURFACE_LOW);
+                view.setBackgroundColor(Color.TRANSPARENT);
                 return view;
             }
 
@@ -4129,13 +4769,18 @@ public class MainActivity extends Activity {
         bar.setPadding(0, dp(8), 0, dp(8));
 
         if (showLogo) {
-            ImageView logo = new ImageView(this);
-            logo.setImageResource(getResources().getIdentifier("abonelik_logo_full", "drawable", getPackageName()));
-            logo.setAdjustViewBounds(true);
-            logo.setScaleType(ImageView.ScaleType.FIT_START);
-            LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(0, dp(74), 1);
-            logoParams.setMargins(0, 0, dp(12), 0);
-            bar.addView(logo, logoParams);
+            LinearLayout brand = new LinearLayout(this);
+            brand.setGravity(Gravity.CENTER_VERTICAL);
+            brand.setOrientation(LinearLayout.HORIZONTAL);
+            brand.addView(appMarkIcon(), new LinearLayout.LayoutParams(dp(46), dp(46)));
+            TextView brandName = text(ui("Abonelik Takibi", "Subscription Tracker"), 22, COLOR_PRIMARY, Typeface.BOLD);
+            LinearLayout.LayoutParams brandNameParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            brandNameParams.setMargins(dp(12), 0, 0, 0);
+            brand.addView(brandName, brandNameParams);
+            bar.addView(brand, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         } else {
             TextView title = text(titleText, 24, COLOR_PRIMARY, Typeface.BOLD);
             bar.addView(title, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
@@ -4311,7 +4956,11 @@ public class MainActivity extends Activity {
                                 progress.dismiss();
                             }
                             if (authTask.isSuccessful()) {
+                                boolean isNewUser = authTask.getResult() != null
+                                        && authTask.getResult().getAdditionalUserInfo() != null
+                                        && authTask.getResult().getAdditionalUserInfo().isNewUser();
                                 finishFirebaseLogin(firebaseAuth.getCurrentUser());
+                                showCountryLanguageSetupAfterGoogle(isNewUser);
                             } else {
                                 Toast.makeText(
                                         this,
@@ -4333,6 +4982,24 @@ public class MainActivity extends Activity {
                 ).show();
             }
         });
+    }
+
+    private void showCountryLanguageSetupAfterGoogle(boolean isNewUser) {
+        if (!isNewUser && isCountryPromptCompletedForCurrentUser()) {
+            return;
+        }
+        pendingCountryPromptAfterCloud = true;
+        if (cloudLoadInProgress) {
+            return;
+        }
+        if (content == null) {
+            ensureCountrySelectionPrompt();
+            return;
+        }
+        content.postDelayed(() -> {
+            pendingCountryPromptAfterCloud = false;
+            ensureCountrySelectionPrompt();
+        }, 250);
     }
 
     @Override
@@ -4545,6 +5212,67 @@ public class MainActivity extends Activity {
         return view;
     }
 
+    private View recordIcon(ExpenseItem item) {
+        String service = serviceKey(item.name);
+        if (service.isEmpty()) {
+            return iconBox(categoryIcon(item.category), categoryTint(item.category), categoryTextColor(item.category));
+        }
+        return serviceLogo(service, item.category);
+    }
+
+    private View serviceLogo(String service, String fallbackCategory) {
+        int resourceId = getResources().getIdentifier("logo_" + service, "drawable", getPackageName());
+        if (resourceId == 0) {
+            return iconBox(categoryIcon(fallbackCategory), categoryTint(fallbackCategory), categoryTextColor(fallbackCategory));
+        }
+        ImageView logo = new ImageView(this);
+        logo.setImageResource(resourceId);
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        logo.setAdjustViewBounds(false);
+        logo.setBackground(round(Color.WHITE, dp(10), COLOR_LINE));
+        logo.setPadding(dp(3), dp(3), dp(3), dp(3));
+        return logo;
+    }
+
+    private String serviceKey(String name) {
+        String value = normalizeServiceName(name);
+        if (value.contains("netflix")) return "netflix";
+        if (value.contains("spotify")) return "spotify";
+        if (value.contains("youtube")) return "youtube";
+        if (value.contains("amazon prime") || value.equals("prime") || value.contains("prime video")) return "prime";
+        if (value.contains("amazon")) return "amazon";
+        if (value.contains("bein") || value.contains("beın")) return "bein";
+        if (value.contains("disney")) return "disney";
+        if (value.contains("apple tv") || value.contains("appletv")) return "apple";
+        if (value.equals("max") || value.contains("hbo max")) return "max";
+        if (value.contains("hulu")) return "hulu";
+        if (value.contains("paramount")) return "paramount";
+        if (value.contains("peacock")) return "peacock";
+        if (value.contains("crunchyroll")) return "crunchyroll";
+        if (value.equals("now") || value.contains("now tv")) return "now";
+        if (value.contains("britbox")) return "britbox";
+        if (value.contains("dazn")) return "dazn";
+        if (value.equals("wow") || value.contains("wow tv")) return "wow";
+        if (value.contains("rtl")) return "rtl";
+        if (value.contains("canal")) return "canal";
+        if (value.contains("chatgpt") || value.contains("openai")) return "chatgpt";
+        if (value.contains("exxen")) return "exxen";
+        if (value.contains("tabii") || value.contains("tabi")) return "tabii";
+        if (value.contains("tod")) return "tod";
+        if (value.contains("gain") || value.contains("gaın")) return "gain";
+        return "";
+    }
+
+    private String normalizeServiceName(String name) {
+        if (name == null) {
+            return "";
+        }
+        return name.toLowerCase(new Locale("tr", "TR"))
+                .replace("ı", "i")
+                .replace("İ", "i")
+                .trim();
+    }
+
     private TextView badge(String value, boolean paid) {
         TextView view = text(paid ? ui("Ödendi", "Paid") : value, 11, paid ? COLOR_PRIMARY : COLOR_ACCENT, Typeface.BOLD);
         view.setGravity(Gravity.CENTER);
@@ -4613,19 +5341,39 @@ public class MainActivity extends Activity {
         nav.setPadding(dp(12), dp(8), dp(12), dp(8) + systemBottomInset);
         nav.setBackground(round(COLOR_SURFACE, dp(0), Color.rgb(229, 231, 235)));
         nav.setElevation(dp(8));
-        nav.addView(navItem(ui("Ana Sayfa", "Home"), SCREEN_HOME), new LinearLayout.LayoutParams(0, dp(56), 1));
-        nav.addView(navItem(ui("Kategoriler", "Categories"), SCREEN_CATEGORIES), new LinearLayout.LayoutParams(0, dp(56), 1));
-        nav.addView(navItem(ui("Takvim", "Calendar"), SCREEN_CALENDAR), new LinearLayout.LayoutParams(0, dp(56), 1));
+        nav.addView(navItem(ui("Ana Sayfa", "Home"), SCREEN_HOME, R.drawable.ic_nav_home), new LinearLayout.LayoutParams(0, dp(56), 1));
+        nav.addView(navItem(ui("Kategoriler", "Categories"), SCREEN_CATEGORIES, R.drawable.ic_nav_categories), new LinearLayout.LayoutParams(0, dp(56), 1));
+        nav.addView(navItem(ui("Takvim", "Calendar"), SCREEN_CALENDAR, R.drawable.ic_nav_calendar), new LinearLayout.LayoutParams(0, dp(56), 1));
         return nav;
     }
 
-    private TextView navItem(String label, int screen) {
+    private View navItem(String label, int screen, int iconRes) {
         boolean active = currentScreen == screen;
-        TextView view = text(label, 12, active ? COLOR_PRIMARY : COLOR_MUTED, Typeface.BOLD);
-        view.setGravity(Gravity.CENTER);
-        view.setBackground(active ? round(Color.rgb(226, 244, 246), dp(18), 0) : null);
-        view.setOnClickListener(v -> showScreen(screen));
-        return view;
+        int color = active ? COLOR_PRIMARY : COLOR_MUTED;
+
+        LinearLayout item = new LinearLayout(this);
+        item.setOrientation(LinearLayout.HORIZONTAL);
+        item.setGravity(Gravity.CENTER);
+        item.setPadding(dp(10), 0, dp(10), 0);
+        item.setBackground(active ? round(Color.rgb(226, 244, 246), dp(18), 0) : null);
+        item.setOnClickListener(v -> showScreen(screen));
+
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(iconRes);
+        Drawable drawable = icon.getDrawable();
+        if (drawable != null) {
+            drawable.setTint(color);
+        }
+        icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(18), dp(18));
+        iconParams.setMargins(0, 0, dp(7), 0);
+        item.addView(icon, iconParams);
+
+        TextView labelView = text(label, 12, color, Typeface.BOLD);
+        labelView.setGravity(Gravity.CENTER);
+        labelView.setSingleLine(true);
+        item.addView(labelView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return item;
     }
 
     private void refreshBottomNav() {
@@ -4633,9 +5381,9 @@ public class MainActivity extends Activity {
             return;
         }
         bottomNav.removeAllViews();
-        bottomNav.addView(navItem(ui("Ana Sayfa", "Home"), SCREEN_HOME), new LinearLayout.LayoutParams(0, dp(56), 1));
-        bottomNav.addView(navItem(ui("Kategoriler", "Categories"), SCREEN_CATEGORIES), new LinearLayout.LayoutParams(0, dp(56), 1));
-        bottomNav.addView(navItem(ui("Takvim", "Calendar"), SCREEN_CALENDAR), new LinearLayout.LayoutParams(0, dp(56), 1));
+        bottomNav.addView(navItem(ui("Ana Sayfa", "Home"), SCREEN_HOME, R.drawable.ic_nav_home), new LinearLayout.LayoutParams(0, dp(56), 1));
+        bottomNav.addView(navItem(ui("Kategoriler", "Categories"), SCREEN_CATEGORIES, R.drawable.ic_nav_categories), new LinearLayout.LayoutParams(0, dp(56), 1));
+        bottomNav.addView(navItem(ui("Takvim", "Calendar"), SCREEN_CALENDAR, R.drawable.ic_nav_calendar), new LinearLayout.LayoutParams(0, dp(56), 1));
     }
 
     private FrameLayout.LayoutParams bottomNavParams() {

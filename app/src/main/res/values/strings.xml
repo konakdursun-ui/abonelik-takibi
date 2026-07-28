@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Abonelik Takibi</string>
+    <string name="app_name">Subscription Manager Tracker</string>
     <string name="country_section_title">Ulke</string>
     <string name="country_turkey">Turkiye</string>
     <string name="country_united_states">Amerika Birlesik Devletleri</string>

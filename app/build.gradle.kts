@@ -24,8 +24,8 @@ android {
         applicationId = "com.dkonak.aboneliktakibi"
         minSdk = 24
         targetSdk = 36
-        versionCode = 57
-        versionName = "1.0.56"
+        versionCode = 80
+        versionName = "1.0.79"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

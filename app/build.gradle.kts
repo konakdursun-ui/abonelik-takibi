@@ -24,8 +24,8 @@ android {
         applicationId = "com.dkonak.aboneliktakibi"
         minSdk = 24
         targetSdk = 36
-        versionCode = 80
-        versionName = "1.0.79"
+        versionCode = 92
+        versionName = "1.0.91"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(platform(libs.firebase.bom))
+    implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.android.gms:play-services-auth:21.4.0")
     implementation("androidx.credentials:credentials:1.3.0")

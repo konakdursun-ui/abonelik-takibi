@@ -25,10 +25,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -79,6 +77,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -157,6 +156,12 @@ public class MainActivity extends Activity {
         addTranslation("PAID", "BEZAHLT", "PAGADO", "PAYÉ", "PAGO");
         addTranslation("LEFT", "OFFEN", "RESTANTE", "RESTANT", "RESTANTE");
         addTranslation("New Record", "Neuer Eintrag", "Nuevo registro", "Nouvel enregistrement", "Novo registro");
+        addTranslation("No records yet", "Noch keine Einträge", "Aún no hay registros", "Aucun enregistrement", "Ainda sem registros");
+        addTranslation("Add your first subscription or bill. No card details are needed; you only save the amount and payment date.", "Füge dein erstes Abo oder deine erste Rechnung hinzu. Kartendaten sind nicht nötig; du speicherst nur Betrag und Zahlungsdatum.", "Añade tu primera suscripción o factura. No se necesitan datos de tarjeta; solo guardas el importe y la fecha de pago.", "Ajoutez votre premier abonnement ou facture. Aucune donnée de carte n'est nécessaire; vous enregistrez seulement le montant et la date de paiement.", "Adicione sua primeira assinatura ou conta. Não são necessários dados do cartão; você salva apenas o valor e a data de pagamento.");
+        addTranslation("Add First Record", "Ersten Eintrag hinzufügen", "Añadir primer registro", "Ajouter le premier enregistrement", "Adicionar primeiro registro");
+        addTranslation("Looking to cancel a subscription?", "Möchtest du ein Abo kündigen?", "¿Quieres cancelar una suscripción?", "Vous voulez résilier un abonnement ?", "Quer cancelar uma assinatura?");
+        addTranslation("After adding services like Netflix, Spotify or Amazon Prime, you can open the official cancellation page from the edit screen.", "Nachdem du Dienste wie Netflix, Spotify oder Amazon Prime hinzugefügt hast, kannst du die offizielle Kündigungsseite über den Bearbeiten-Bildschirm öffnen.", "Después de añadir servicios como Netflix, Spotify o Amazon Prime, puedes abrir la página oficial de cancelación desde la pantalla de edición.", "Après avoir ajouté des services comme Netflix, Spotify ou Amazon Prime, vous pouvez ouvrir la page officielle de résiliation depuis l'écran de modification.", "Depois de adicionar serviços como Netflix, Spotify ou Amazon Prime, você pode abrir a página oficial de cancelamento na tela de edição.");
+        addTranslation("Add a record for cancellation help", "Eintrag für Kündigungshilfe hinzufügen", "Añadir registro para ayuda de cancelación", "Ajouter un enregistrement pour l'aide à la résiliation", "Adicionar registro para ajuda de cancelamento");
         addTranslation("Category summary", "Kategorieübersicht", "Resumen por categoría", "Résumé par catégorie", "Resumo por categoria");
         addTranslation("Upcoming Payments", "Anstehende Zahlungen", "Pagos próximos", "Paiements à venir", "Pagamentos próximos");
         addTranslation("See All", "Alle ansehen", "Ver todo", "Tout voir", "Ver tudo");
@@ -243,7 +248,10 @@ public class MainActivity extends Activity {
         addTranslation("Weekly", "Wöchentlich", "Semanal", "Hebdomadaire", "Semanal");
         addTranslation("Monthly", "Monatlich", "Mensual", "Mensuel", "Mensal");
         addTranslation("Yearly", "Jährlich", "Anual", "Annuel", "Anual");
-        addTranslation("Reminder frequency: ", "Erinnerungshäufigkeit: ", "Frecuencia de recordatorio: ", "Fréquence du rappel : ", "Frequência do lembrete: ");
+        addTranslation("Recurring Payment", "Wiederkehrende Zahlung", "Pago recurrente", "Paiement récurrent", "Pagamento recorrente");
+        addTranslation("Reminder", "Erinnerung", "Recordatorio", "Rappel", "Lembrete");
+        addTranslation("Reminder starts: ", "Erinnerung ab: ", "Recordatorio desde: ", "Rappel à partir de : ", "Lembrete começa: ");
+        addTranslation("Notify every day from your chosen day until it is paid", "Ab dem gewählten Tag täglich erinnern, bis bezahlt wurde", "Notificar cada día desde el día elegido hasta que se pague", "Notifier chaque jour à partir du jour choisi jusqu'au paiement", "Notificar todos os dias a partir do dia escolhido até ser pago");
         addTranslation("REMINDER FREQUENCY", "ERINNERUNGSHÄUFIGKEIT", "FRECUENCIA DE RECORDATORIO", "FRÉQUENCE DU RAPPEL", "FREQUÊNCIA DO LEMBRETE");
         addTranslation("SUBSCRIPTION END DATE", "ABO-ENDDATUM", "FECHA DE FIN DE SUSCRIPCIÓN", "DATE DE FIN D'ABONNEMENT", "DATA DE TÉRMINO DA ASSINATURA");
         addTranslation("Save", "Speichern", "Guardar", "Enregistrer", "Salvar");
@@ -295,7 +303,8 @@ public class MainActivity extends Activity {
         addTranslation("End: ", "Ende: ", "Fin: ", "Fin : ", "Fim: ");
         addTranslation("No end date", "Kein Enddatum", "Sin fecha de fin", "Pas de date de fin", "Sem data de término");
         addTranslation("Close", "Schließen", "Cerrar", "Fermer", "Fechar");
-        addTranslation("Reminder frequency", "Erinnerungshäufigkeit", "Frecuencia de recordatorio", "Fréquence du rappel", "Frequência do lembrete");
+        addTranslation("Reminder starts", "Erinnerung ab", "Recordatorio desde", "Rappel à partir de", "Lembrete começa");
+        addTranslation("REMINDER STARTS", "ERINNERUNG AB", "RECORDATORIO DESDE", "RAPPEL À PARTIR DE", "LEMBRETE COMEÇA");
         addTranslation("End Date: ", "Enddatum: ", "Fecha de fin: ", "Date de fin : ", "Data de término: ");
         addTranslation("No end date (tap to select)", "Kein Enddatum (zum Auswählen tippen)", "Sin fecha de fin (toca para elegir)", "Pas de date de fin (touchez pour choisir)", "Sem data de término (toque para selecionar)");
         addTranslation("Subscription end date", "Abo-Enddatum", "Fecha de fin de suscripción", "Date de fin d'abonnement", "Data de término da assinatura");
@@ -364,9 +373,12 @@ public class MainActivity extends Activity {
     private final Calendar displayedCalendar = Calendar.getInstance();
     private ExpenseItem editingItem;
     private FirebaseAuth firebaseAuth;
+    private FirebaseAnalytics firebaseAnalytics;
     private FirebaseFirestore firestore;
     private FirebaseStorage storage;
     private GoogleSignInClient googleClient;
+    private String pendingQuickStartName = "";
+    private String pendingQuickStartCategory = "";
     private String webClientId = "";
     private boolean applyingCloudData;
     private boolean pendingCloudLoad;
@@ -425,6 +437,7 @@ public class MainActivity extends Activity {
             requestNotificationPermissionIfNeeded();
             scheduleReminders();
         }
+        logAnalyticsEvent("app_open_local");
     }
 
     private void showStartupFallback(Throwable throwable) {
@@ -573,13 +586,26 @@ public class MainActivity extends Activity {
         content.addView(stats);
 
         Button addRecord = primaryButton("+  " + ui("Yeni Kayıt", "New Record"));
-        addRecord.setOnClickListener(v -> openRecordScreen(null));
+        addRecord.setOnClickListener(v -> {
+            logAnalyticsEvent("home_new_record_clicked", "source", "main_button");
+            openRecordScreen(null);
+        });
         LinearLayout.LayoutParams addParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 dp(56)
         );
         addParams.setMargins(0, dp(20), 0, dp(24));
         content.addView(addRecord, addParams);
+
+        if (items.isEmpty()) {
+            logAnalyticsEvent("empty_home_shown", "state", "no_records");
+            content.addView(firstRecordPromptCard());
+            content.addView(cancelHelpCard());
+            upcomingList = listContainer();
+            allItemsList = listContainer();
+            render();
+            return;
+        }
 
         content.addView(sectionHeader(ui("Yaklaşan Ödemeler", "Upcoming Payments"), ui("Tümünü Gör", "See All")));
         upcomingList = listContainer();
@@ -622,6 +648,96 @@ public class MainActivity extends Activity {
         section.addView(scroll, scrollParams);
         loadRemoteCampaigns(list, true, section);
         return section;
+    }
+
+    private View firstRecordPromptCard() {
+        LinearLayout card = formCard();
+        card.setBackground(round(Color.rgb(235, 250, 251), dp(18), COLOR_LINE));
+
+        TextView title = text(ui("Henüz kayıt yok", "No records yet"), 19, COLOR_TEXT, Typeface.BOLD);
+        card.addView(title);
+
+        TextView copy = text(ui(
+                "İlk aboneliğini veya faturanı ekle. Kart bilgisi gerekmez; yalnızca tutar ve ödeme tarihini kaydedersin.",
+                "Add your first subscription or bill. No card details are needed; you only save the amount and payment date."
+        ), 13, COLOR_MUTED, Typeface.NORMAL);
+        copy.setPadding(0, dp(8), 0, dp(14));
+        card.addView(copy);
+
+        LinearLayout quick = new LinearLayout(this);
+        quick.setOrientation(LinearLayout.HORIZONTAL);
+        addQuickStartChip(quick, "Netflix", "Abonelik");
+        addQuickStartChip(quick, "Spotify", "Abonelik");
+        addQuickStartChip(quick, "YouTube Premium", "Abonelik");
+        HorizontalScrollView quickScroll = new HorizontalScrollView(this);
+        quickScroll.setHorizontalScrollBarEnabled(false);
+        quickScroll.addView(quick);
+        card.addView(quickScroll);
+
+        LinearLayout bills = new LinearLayout(this);
+        bills.setOrientation(LinearLayout.HORIZONTAL);
+        bills.setPadding(0, dp(10), 0, 0);
+        addQuickStartChip(bills, ui("Elektrik", "Electricity"), "Elektrik");
+        addQuickStartChip(bills, ui("İnternet", "Internet"), "İnternet");
+        addQuickStartChip(bills, ui("Kira", "Rent"), "Kira");
+        HorizontalScrollView billScroll = new HorizontalScrollView(this);
+        billScroll.setHorizontalScrollBarEnabled(false);
+        billScroll.addView(bills);
+        card.addView(billScroll);
+
+        Button cta = primaryButton(ui("İlk Kaydı Ekle", "Add First Record"));
+        cta.setOnClickListener(v -> {
+            logAnalyticsEvent("empty_state_cta_clicked", "source", "first_record_card");
+            openRecordScreen(null);
+        });
+        LinearLayout.LayoutParams ctaParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(52));
+        ctaParams.setMargins(0, dp(16), 0, 0);
+        card.addView(cta, ctaParams);
+        return card;
+    }
+
+    private void addQuickStartChip(LinearLayout row, String label, String category) {
+        String serviceKey = serviceKey(label);
+        int bg = "Abonelik".equals(category)
+                ? serviceBrandColor(serviceKey, Color.rgb(226, 244, 246))
+                : categoryTint(category);
+        int fg = "Abonelik".equals(category) ? serviceBrandTextColor(serviceKey) : categoryTextColor(category);
+        TextView chip = text(label, 12, fg, Typeface.BOLD);
+        chip.setGravity(Gravity.CENTER);
+        chip.setPadding(dp(14), 0, dp(14), 0);
+        chip.setBackground(round(bg, dp(18), 0));
+        chip.setOnClickListener(v -> quickStartRecord(label, category));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(40));
+        params.setMargins(0, 0, dp(8), 0);
+        row.addView(chip, params);
+    }
+
+    private void quickStartRecord(String name, String category) {
+        pendingQuickStartName = name;
+        pendingQuickStartCategory = category;
+        logAnalyticsEvent("quick_start_record_clicked", "category", category);
+        openRecordScreen(null);
+    }
+
+    private View cancelHelpCard() {
+        LinearLayout card = formCard();
+        TextView title = text(ui("Abonelik iptali mi arıyorsun?", "Looking to cancel a subscription?"), 17, COLOR_TEXT, Typeface.BOLD);
+        card.addView(title);
+        TextView copy = text(ui(
+                "Netflix, Spotify, Amazon Prime gibi kayıtlarını ekledikten sonra düzenle ekranından resmi iptal sayfasına gidebilirsin.",
+                "After adding services like Netflix, Spotify or Amazon Prime, you can open the official cancellation page from the edit screen."
+        ), 13, COLOR_MUTED, Typeface.NORMAL);
+        copy.setPadding(0, dp(8), 0, dp(12));
+        card.addView(copy);
+        Button action = outlineButton(ui("İptal yönlendirmesi için kayıt ekle", "Add a record for cancellation help"));
+        action.setOnClickListener(v -> {
+            logAnalyticsEvent("cancel_help_clicked", "source", "empty_home");
+            pendingQuickStartCategory = "Abonelik";
+            pendingQuickStartName = "";
+            openRecordScreen(null);
+        });
+        card.addView(action, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(50)));
+        return card;
     }
 
     private int cachedCampaignCount() {
@@ -1241,6 +1357,7 @@ private String getLanguageCode() {
             int webClientResId = getResources().getIdentifier("default_web_client_id", "string", getPackageName());
             webClientId = webClientResId == 0 ? "" : getString(webClientResId).trim();
             firebaseAuth = FirebaseAuth.getInstance(app);
+            firebaseAnalytics = FirebaseAnalytics.getInstance(this);
             firestore = FirebaseFirestore.getInstance(app);
             firestore.setFirestoreSettings(new FirebaseFirestoreSettings.Builder()
                     .setPersistenceEnabled(true)
@@ -1256,6 +1373,7 @@ private String getLanguageCode() {
             }
         } catch (Throwable e) {
             firebaseAuth = null;
+            firebaseAnalytics = null;
             firestore = null;
             storage = null;
             clearStaleLocalSession();
@@ -1339,6 +1457,7 @@ private String getLanguageCode() {
             content.setPadding(dp(16), dp(8), dp(16), dp(132));
             showScreenFromBack(SCREEN_HOME);
         }
+        logAnalyticsEvent(navigateHome ? "login_success" : "session_restored", "provider", PROVIDER_GOOGLE);
     }
 
     private void createAccount(EditText name, EditText email, EditText password) {
@@ -1777,6 +1896,11 @@ private String getLanguageCode() {
         editingItem = item;
         returnScreen = currentScreen == SCREEN_RECORD ? SCREEN_HOME : currentScreen;
         showScreen(SCREEN_RECORD);
+        if (item == null) {
+            logAnalyticsEvent("new_record_started");
+        } else {
+            logAnalyticsEvent("record_edit_started", "category", item.category);
+        }
     }
 
     private void buildRecordScreen() {
@@ -1795,26 +1919,27 @@ private String getLanguageCode() {
         header.addView(profile, new LinearLayout.LayoutParams(dp(TOP_AVATAR_SIZE_DP), dp(TOP_AVATAR_SIZE_DP)));
         content.addView(header);
 
+        if (editingItem == null) {
+            buildNewRecordWizard();
+            return;
+        }
+
         EditText name = field(ui("Örn: Netflix Premium", "Ex: Netflix Premium"));
         EditText amount = field("0,00");
         amount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        if (editingItem != null) {
-            name.setText(editingItem.name);
-            amount.setText(String.valueOf(editingItem.amount));
-        }
+        name.setText(editingItem.name);
+        amount.setText(String.valueOf(editingItem.amount));
 
         Spinner category = new Spinner(this);
         category.setAdapter(categoryAdapter());
-        category.setSelection(categoryIndex(editingItem == null ? "Abonelik" : editingItem.category));
+        category.setSelection(categoryIndex(editingItem.category));
         category.setBackground(round(
-                categoryTint(editingItem == null ? "Abonelik" : editingItem.category),
+                categoryTint(editingItem.category),
                 dp(12),
-                categoryTextColor(editingItem == null ? "Abonelik" : editingItem.category)
+                categoryTextColor(editingItem.category)
         ));
         Calendar selected = Calendar.getInstance();
-        if (editingItem != null) {
-            selected.set(editingItem.year, editingItem.month, editingItem.day);
-        }
+        selected.set(editingItem.year, editingItem.month, editingItem.day);
         TextView date = fieldLikeText(ui("Ödeme Tarihi: ", "Payment Date: ") + formatDate(selected));
         date.setOnClickListener(v -> new DatePickerDialog(
                 this,
@@ -1839,7 +1964,7 @@ private String getLanguageCode() {
         content.addView(categoryCard);
 
         View popularServices = popularServicesCard(name, amount);
-        popularServices.setVisibility((editingItem == null || "Abonelik".equals(editingItem.category)) ? View.VISIBLE : View.GONE);
+        popularServices.setVisibility("Abonelik".equals(editingItem.category) ? View.VISIBLE : View.GONE);
         content.addView(popularServices);
 
         LinearLayout infoCard = formCard();
@@ -1850,20 +1975,8 @@ private String getLanguageCode() {
         infoCard.addView(amount, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
         content.addView(infoCard);
 
-        CheckBox monthly = styledCheck(ui("Her ay tekrar eder", "Repeats monthly"), ui("Otomatik kayıt oluşturulur", "Creates automatic monthly records"));
-        monthly.setChecked(editingItem == null || editingItem.monthly);
-        TextView smartSuggestion = text(ui("Akıllı öneri: hizmet adını yazınca kategori ve tekrar seçimi otomatik önerilir.", "Smart suggestion: type a service name to auto-suggest category and repeat."),
-                13, COLOR_MUTED, Typeface.NORMAL);
-        smartSuggestion.setPadding(dp(4), 0, dp(4), dp(12));
-        if (editingItem == null) {
-            name.addTextChangedListener(new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    applySmartRecordSuggestion(s.toString(), category, monthly, smartSuggestion);
-                }
-                @Override public void afterTextChanged(Editable s) {}
-            });
-        }
+        CheckBox monthly = styledCheck(ui("Tekrar Eden Ödeme", "Recurring Payment"), "");
+        monthly.setChecked(editingItem.monthly);
         category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             private boolean firstSelection = true;
 
@@ -1871,17 +1984,13 @@ private String getLanguageCode() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedCategory = CATEGORIES[position];
                 category.setBackground(round(categoryTint(selectedCategory), dp(12), categoryTextColor(selectedCategory)));
-                if (editingItem == null || !firstSelection) {
+                if (!firstSelection) {
                     monthly.setChecked(isRecurringCategory(selectedCategory));
                 }
                 if ("Abonelik".equals(selectedCategory)) {
                     popularServices.setVisibility(View.VISIBLE);
                 } else {
                     popularServices.setVisibility(View.GONE);
-                    if (editingItem == null) {
-                        name.setText(localizedCategory(selectedCategory));
-                        name.setSelection(name.getText().length());
-                    }
                 }
                 firstSelection = false;
             }
@@ -1890,16 +1999,16 @@ private String getLanguageCode() {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        CheckBox reminder = styledCheck(ui("Hatırlatma aç", "Enable reminder"), ui("Seçtiğiniz aralıkta ödeme öncesi bildir", "Notify before payment at your chosen interval"));
-        reminder.setChecked(editingItem == null || editingItem.reminderEnabled);
-        String[] reminderOptions = {ui("Günlük", "Daily"), ui("Haftalık", "Weekly"), ui("Aylık", "Monthly"), ui("Yıllık", "Yearly")};
-        String[] selectedReminderFrequency = {editingItem == null ? ui("Günlük", "Daily") : localizedReminderFrequency(editingItem.reminderFrequency)};
-        TextView reminderFrequency = fieldLikeText(ui("Bildirim sıklığı: ", "Reminder frequency: ") + selectedReminderFrequency[0] + "  ▾");
+        CheckBox reminder = styledCheck(ui("Hatırlatma", "Reminder"), "");
+        reminder.setChecked(editingItem.reminderEnabled);
+        String[] reminderOptions = reminderLeadOptions();
+        String[] selectedReminderFrequency = {localizedReminderFrequency(editingItem.reminderFrequency)};
+        TextView reminderFrequency = fieldLikeText(ui("Hatırlatma başlangıcı: ", "Reminder starts: ") + selectedReminderFrequency[0] + "  ▾");
         reminderFrequency.setOnClickListener(v -> showReminderFrequencyDialog(
                 reminderOptions, selectedReminderFrequency, reminderFrequency));
 
         Calendar endSelected = Calendar.getInstance();
-        boolean[] hasEndDate = {editingItem != null && editingItem.hasEndDate};
+        boolean[] hasEndDate = {editingItem.hasEndDate};
         if (hasEndDate[0]) {
             endSelected.set(editingItem.endYear, editingItem.endMonth, editingItem.endDay);
         } else {
@@ -1909,11 +2018,10 @@ private String getLanguageCode() {
         TextView endDate = fieldLikeText(endDateLabel(hasEndDate[0], endSelected));
         endDate.setOnClickListener(v -> showEndDateDialog(endDate, endSelected, hasEndDate));
         LinearLayout automation = formCard();
-        automation.addView(smartSuggestion);
         automation.addView(monthly);
         automation.addView(divider());
         automation.addView(reminder);
-        automation.addView(formLabel(ui("BİLDİRİM SIKLIĞI", "REMINDER FREQUENCY")));
+        automation.addView(formLabel(ui("HATIRLATMA BAŞLANGICI", "REMINDER STARTS")));
         automation.addView(reminderFrequency, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
         automation.addView(spacer(dp(14)));
         automation.addView(formLabel(ui("ABONELİK BİTİŞ TARİHİ", "SUBSCRIPTION END DATE")));
@@ -1931,18 +2039,16 @@ private String getLanguageCode() {
         saveParams.setMargins(0, dp(18), 0, dp(28));
         content.addView(save, saveParams);
 
-        if (editingItem != null) {
-            ExpenseItem itemToDelete = editingItem;
-            Button delete = outlineButton(ui("Sil", "Delete"));
-            delete.setTextColor(Color.rgb(147, 45, 35));
-            delete.setOnClickListener(v -> confirmDeleteFromEdit(itemToDelete));
-            LinearLayout.LayoutParams deleteParams = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, dp(56));
-            deleteParams.setMargins(0, dp(12), 0, 0);
-            content.addView(delete, deleteParams);
-        }
+        ExpenseItem itemToDelete = editingItem;
+        Button delete = outlineButton(ui("Sil", "Delete"));
+        delete.setTextColor(Color.rgb(147, 45, 35));
+        delete.setOnClickListener(v -> confirmDeleteFromEdit(itemToDelete));
+        LinearLayout.LayoutParams deleteParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(56));
+        deleteParams.setMargins(0, dp(12), 0, 0);
+        content.addView(delete, deleteParams);
 
-        if (editingItem != null && isCancellableService(editingItem)) {
+        if (isCancellableService(editingItem)) {
             Button cancelSubscription = outlineButton("Aboneliği İptal Et");
             cancelSubscription.setTextColor(Color.rgb(147, 45, 35));
             cancelSubscription.setOnClickListener(v -> openCancellationPage(editingItem));
@@ -1961,21 +2067,23 @@ private String getLanguageCode() {
         titleRow.addView(text(currentCountryLabel(), 13, COLOR_PRIMARY, Typeface.BOLD));
         card.addView(titleRow);
 
-        TextView description = text(ui("Ülkene göre popüler hizmetleri seç, kayıt bilgileri otomatik dolsun.", "Pick popular services for your region and auto-fill the record."), 13, COLOR_MUTED, Typeface.NORMAL);
-        description.setPadding(0, dp(6), 0, dp(12));
-        card.addView(description);
-
         String[] services = popularServicesForCountry();
         HorizontalScrollView scroll = new HorizontalScrollView(this);
         scroll.setHorizontalScrollBarEnabled(false);
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         for (String service : services) {
-            TextView chip = text(service, 13, COLOR_PRIMARY, Typeface.BOLD);
+            String key = serviceKey(service);
+            int chipColor = serviceBrandColor(key, Color.rgb(226, 244, 246));
+            int chipText = serviceBrandTextColor(key);
+            TextView chip = text(service, 13, chipText, Typeface.BOLD);
             chip.setGravity(Gravity.CENTER);
             chip.setPadding(dp(16), 0, dp(16), 0);
-            chip.setBackground(round(Color.rgb(226, 244, 246), dp(20), COLOR_LINE));
-            chip.setOnClickListener(v -> showServicePlans(service, name, amount));
+            chip.setBackground(round(chipColor, dp(20), 0));
+            chip.setOnClickListener(v -> {
+                logAnalyticsEvent("popular_service_selected", "service", serviceKey(service));
+                showServicePlans(service, name, amount);
+            });
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, dp(44));
             params.setMargins(0, 0, dp(10), 0);
@@ -2183,49 +2291,6 @@ private String getLanguageCode() {
         };
     }
 
-    private void applySmartRecordSuggestion(String value, Spinner category, CheckBox monthly, TextView suggestion) {
-        String normalized = normalizeServiceText(value);
-        if (normalized.isEmpty()) {
-            suggestion.setText("Akıllı öneri: hizmet adını yazınca kategori ve tekrar seçimi otomatik önerilir.");
-            return;
-        }
-        String suggestedCategory = null;
-        if (containsAny(normalized, "netflix", "spotify", "youtube", "prime", "amazon", "disney", "exxen", "gain", "gaın", "tod", "bein", "hbo", "max", "tabii", "hulu", "paramount", "peacock", "apple tv", "crunchyroll", "britbox", "dazn", "canal", "now")) {
-            suggestedCategory = "Abonelik";
-        } else if (containsAny(normalized, "turkcell", "vodafone", "turk telekom", "telekom", "telefon", "hat")) {
-            suggestedCategory = "Telefon";
-        } else if (containsAny(normalized, "internet", "fiber", "superonline", "kablonet", "millenicom", "netspeed")) {
-            suggestedCategory = "İnternet";
-        } else if (containsAny(normalized, "elektrik", "ck", "bedaş", "ayedas", "enerjisa")) {
-            suggestedCategory = "Elektrik";
-        } else if (containsAny(normalized, "su", "iski", "aski")) {
-            suggestedCategory = "Su";
-        } else if (containsAny(normalized, "dogalgaz", "doğalgaz", "igdas", "igdaş", "gaz")) {
-            suggestedCategory = "Doğalgaz";
-        } else if (containsAny(normalized, "kira", "ev")) {
-            suggestedCategory = "Kira";
-        }
-        if (suggestedCategory == null) {
-            suggestion.setText("Akıllı öneri: bu kayıt için özel öneri bulunamadı.");
-            return;
-        }
-        int index = categoryIndex(suggestedCategory);
-        if (index >= 0 && category.getSelectedItemPosition() != index) {
-            category.setSelection(index);
-        }
-        monthly.setChecked(isRecurringCategory(suggestedCategory));
-        suggestion.setText("Akıllı öneri: " + suggestedCategory + " kategorisi ve aylık tekrar önerildi.");
-    }
-
-    private boolean containsAny(String text, String... needles) {
-        for (String needle : needles) {
-            if (text.contains(needle)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private String normalizeServiceText(String value) {
         return value == null ? "" : value.trim().toLowerCase(new Locale("tr", "TR"));
     }
@@ -2333,6 +2398,148 @@ private String getLanguageCode() {
             return added > 0;
         } catch (Exception ignored) {
             return false;
+        }
+    }
+
+    private void buildNewRecordWizard() {
+        EditText name = field(ui("Örn: Netflix Premium", "Ex: Netflix Premium"));
+        EditText amount = field("0,00");
+        amount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        Spinner category = new Spinner(this);
+        category.setAdapter(categoryAdapter());
+        String quickName = pendingQuickStartName;
+        String quickCategory = pendingQuickStartCategory;
+        pendingQuickStartName = "";
+        pendingQuickStartCategory = "";
+        String initialCategory = quickCategory == null || quickCategory.trim().isEmpty() ? "Abonelik" : quickCategory;
+        category.setSelection(categoryIndex(initialCategory));
+        category.setBackground(round(categoryTint(initialCategory), dp(12), categoryTextColor(initialCategory)));
+        if (quickName != null && !quickName.trim().isEmpty()) {
+            name.setText(quickName);
+            name.setSelection(name.getText().length());
+        } else if (!"Abonelik".equals(initialCategory)) {
+            name.setText(localizedCategory(initialCategory));
+            name.setSelection(name.getText().length());
+        }
+
+        Calendar selected = Calendar.getInstance();
+        TextView date = fieldLikeText(ui("Ödeme Tarihi: ", "Payment Date: ") + formatDate(selected));
+        date.setOnClickListener(v -> new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) -> {
+                    selected.set(year, month, dayOfMonth);
+                    date.setText(ui("Ödeme Tarihi: ", "Payment Date: ") + formatDate(selected));
+                },
+                selected.get(Calendar.YEAR),
+                selected.get(Calendar.MONTH),
+                selected.get(Calendar.DAY_OF_MONTH)
+        ).show());
+
+        CheckBox monthly = styledCheck(ui("Tekrar Eden Ödeme", "Recurring Payment"), "");
+        monthly.setChecked(true);
+        CheckBox reminder = styledCheck(ui("Hatırlatma", "Reminder"), "");
+        reminder.setChecked(true);
+        String[] selectedReminderFrequency = {localizedReminderFrequency("1")};
+
+        Calendar endSelected = Calendar.getInstance();
+        endSelected.setTimeInMillis(selected.getTimeInMillis());
+        endSelected.add(Calendar.YEAR, 1);
+        boolean[] hasEndDate = {false};
+        TextView endDate = fieldLikeText(endDateLabel(false, endSelected));
+        endDate.setOnClickListener(v -> showEndDateDialog(endDate, endSelected, hasEndDate));
+
+        LinearLayout wizardContainer = new LinearLayout(this);
+        wizardContainer.setOrientation(LinearLayout.VERTICAL);
+        content.addView(wizardContainer);
+
+        LinearLayout categoryCard = formCard();
+        LinearLayout categoryHeader = new LinearLayout(this);
+        categoryHeader.setGravity(Gravity.CENTER_VERTICAL);
+        categoryHeader.addView(formLabel(ui("KATEGORİ SEÇİMİ", "CATEGORY")), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        categoryCard.addView(categoryHeader);
+        categoryCard.addView(category, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(58)));
+        Button categoryNext = primaryButton(ui("Devam Et", "Continue"));
+        LinearLayout.LayoutParams stepButtonParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(52));
+        stepButtonParams.setMargins(0, dp(14), 0, 0);
+        categoryCard.addView(categoryNext, stepButtonParams);
+
+        View popularServices = popularServicesCard(name, amount);
+        Button servicesNext = primaryButton(ui("Devam Et", "Continue"));
+        LinearLayout.LayoutParams servicesNextParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(52));
+        servicesNextParams.setMargins(0, dp(14), 0, 0);
+        if (popularServices instanceof LinearLayout) {
+            ((LinearLayout) popularServices).addView(servicesNext, servicesNextParams);
+        }
+
+        LinearLayout infoCard = formCard();
+        infoCard.addView(formLabel(ui("Kayıt Adı", "Record Name")));
+        infoCard.addView(name, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
+        infoCard.addView(spacer(dp(18)));
+        infoCard.addView(formLabel(ui("Tutar", "Amount")));
+        infoCard.addView(amount, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
+        infoCard.addView(spacer(dp(18)));
+        infoCard.addView(formLabel(ui("ÖDEME TARİHİ", "PAYMENT DATE")));
+        infoCard.addView(date, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
+        infoCard.addView(spacer(dp(14)));
+        infoCard.addView(formLabel(ui("ABONELİK BİTİŞ TARİHİ", "SUBSCRIPTION END DATE")));
+        infoCard.addView(endDate, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
+
+        Button save = secondaryButton("▣  " + ui("Kaydet", "Save"));
+        save.setTextColor(Color.rgb(44, 23, 0));
+        save.setOnClickListener(v -> saveRecordFromForm(name, amount, category, monthly, selected,
+                reminder.isChecked(), selectedReminderFrequency[0], hasEndDate[0], endSelected));
+        LinearLayout.LayoutParams saveParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                dp(58)
+        );
+        saveParams.setMargins(0, dp(16), 0, 0);
+        infoCard.addView(save, saveParams);
+
+        boolean[] categoryStepCompleted = {quickCategory != null && !quickCategory.trim().isEmpty()};
+        showWizardStep(wizardContainer, categoryStepCompleted[0] ? infoCard : categoryCard);
+        category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedCategory = CATEGORIES[position];
+                category.setBackground(round(categoryTint(selectedCategory), dp(12), categoryTextColor(selectedCategory)));
+                monthly.setChecked(true);
+                if (!"Abonelik".equals(selectedCategory)) {
+                    name.setText(localizedCategory(selectedCategory));
+                    name.setSelection(name.getText().length());
+                }
+                if (categoryStepCompleted[0]) {
+                    boolean subscription = "Abonelik".equals(selectedCategory);
+                    showWizardStep(wizardContainer, subscription ? popularServices : infoCard);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        categoryNext.setOnClickListener(v -> {
+            categoryStepCompleted[0] = true;
+            String selectedCategory = (String) category.getSelectedItem();
+            logAnalyticsEvent("record_category_next", "category", selectedCategory);
+            if ("Abonelik".equals(selectedCategory)) {
+                showWizardStep(wizardContainer, popularServices);
+            } else {
+                showWizardStep(wizardContainer, infoCard);
+            }
+        });
+        servicesNext.setOnClickListener(v -> {
+            logAnalyticsEvent("record_services_next", "has_name", name.getText().toString().trim().isEmpty() ? "false" : "true");
+            showWizardStep(wizardContainer, infoCard);
+        });
+    }
+
+    private void showWizardStep(LinearLayout container, View step) {
+        container.removeAllViews();
+        container.addView(step);
+        if (mainScrollView != null) {
+            mainScrollView.post(() -> mainScrollView.smoothScrollTo(0, 0));
         }
     }
 
@@ -2601,6 +2808,12 @@ private String getLanguageCode() {
         target.paid = false;
         target.paidMonth = -1;
         target.paidYear = -1;
+        logAnalyticsEvent(
+                editingItem == null ? "record_saved" : "record_updated",
+                "category", target.category,
+                "monthly", target.monthly ? "true" : "false",
+                "reminder", target.reminderEnabled ? "true" : "false"
+        );
         saveItems();
         scheduleReminders();
         editingItem = null;
@@ -2790,6 +3003,14 @@ private String getLanguageCode() {
         if (pendingIntent != null) {
             alarmManager.cancel(pendingIntent);
             pendingIntent.cancel();
+        }
+        for (int dayOffset = 0; dayOffset <= 5; dayOffset++) {
+            PendingIntent dailyPendingIntent = PendingIntent.getBroadcast(this, reminderRequestCode(item, dayOffset), intent,
+                    PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
+            if (dailyPendingIntent != null) {
+                alarmManager.cancel(dailyPendingIntent);
+                dailyPendingIntent.cancel();
+            }
         }
     }
 
@@ -3127,7 +3348,7 @@ private String getLanguageCode() {
         body.setOrientation(LinearLayout.VERTICAL);
         body.setPadding(dp(18), dp(18), dp(18), dp(10));
         body.setBackgroundColor(COLOR_SURFACE);
-        TextView title = text(ui("Bildirim sıklığı", "Reminder frequency"), 21, COLOR_TEXT, Typeface.BOLD);
+        TextView title = text(ui("Hatırlatma başlangıcı", "Reminder starts"), 21, COLOR_TEXT, Typeface.BOLD);
         title.setPadding(dp(4), 0, dp(4), dp(12));
         body.addView(title);
 
@@ -3142,7 +3363,7 @@ private String getLanguageCode() {
                     active ? COLOR_PRIMARY_CONTAINER : 0));
             choice.setOnClickListener(v -> {
                 selected[0] = option;
-                label.setText(ui("Bildirim sıklığı: ", "Reminder frequency: ") + option + "  ▾");
+                label.setText(ui("Hatırlatma başlangıcı: ", "Reminder starts: ") + option + "  ▾");
                 holder[0].dismiss();
             });
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -3177,29 +3398,39 @@ private String getLanguageCode() {
         if (neutral != null) neutral.setTextColor(COLOR_MUTED);
     }
 
-    private int reminderFrequencyIndex(String frequency) {
-        String storageValue = reminderFrequencyStorageValue(frequency);
-        if ("Haftalık".equals(storageValue)) return 1;
-        if ("Aylık".equals(storageValue)) return 2;
-        if ("Yıllık".equals(storageValue)) return 3;
-        return 0;
-    }
-
     private String localizedReminderFrequency(String frequency) {
-        String storageValue = reminderFrequencyStorageValue(frequency);
-        if ("Haftalık".equals(storageValue)) return ui("Haftalık", "Weekly");
-        if ("Aylık".equals(storageValue)) return ui("Aylık", "Monthly");
-        if ("Yıllık".equals(storageValue)) return ui("Yıllık", "Yearly");
-        return ui("Günlük", "Daily");
+        int days = reminderLeadDays(frequency);
+        String language = getLanguageCode();
+        if ("de".equals(language)) return days + " Tag" + (days == 1 ? "" : "e") + " vorher";
+        if ("es".equals(language)) return days + " día" + (days == 1 ? "" : "s") + " antes";
+        if ("fr".equals(language)) return days + " jour" + (days == 1 ? "" : "s") + " avant";
+        if ("pt".equals(language)) return days + " dia" + (days == 1 ? "" : "s") + " antes";
+        return ui(days + " gün önce", days + " day" + (days == 1 ? "" : "s") + " before");
     }
 
     private String reminderFrequencyStorageValue(String frequency) {
-        if (frequency == null) return "Günlük";
+        return String.valueOf(reminderLeadDays(frequency));
+    }
+
+    private String[] reminderLeadOptions() {
+        String[] options = new String[5];
+        for (int i = 0; i < options.length; i++) {
+            options[i] = localizedReminderFrequency(String.valueOf(i + 1));
+        }
+        return options;
+    }
+
+    private int reminderLeadDays(String frequency) {
+        if (frequency == null) return 1;
         String normalized = frequency.trim().toLowerCase(Locale.US);
-        if ("weekly".equals(normalized) || "haftalık".equalsIgnoreCase(frequency)) return "Haftalık";
-        if ("monthly".equals(normalized) || "aylık".equalsIgnoreCase(frequency)) return "Aylık";
-        if ("yearly".equals(normalized) || "annual".equals(normalized) || "yıllık".equalsIgnoreCase(frequency)) return "Yıllık";
-        return "Günlük";
+        if (normalized.contains("5")) return 5;
+        if (normalized.contains("4")) return 4;
+        if (normalized.contains("3")) return 3;
+        if (normalized.contains("2")) return 2;
+        if ("weekly".equals(normalized) || "haftalık".equals(normalized)) return 5;
+        if ("monthly".equals(normalized) || "aylık".equals(normalized)) return 5;
+        if ("yearly".equals(normalized) || "annual".equals(normalized) || "yıllık".equals(normalized)) return 5;
+        return 1;
     }
 
     private String endDateLabel(boolean hasEndDate, Calendar date) {
@@ -3239,14 +3470,6 @@ private String getLanguageCode() {
             clean = clean.replace(".", "").replace(',', '.');
         }
         return Double.parseDouble(clean);
-    }
-
-    private void moveToReminderDate(Calendar reminder, String frequency) {
-        String storageValue = reminderFrequencyStorageValue(frequency);
-        if ("Yıllık".equals(storageValue)) reminder.add(Calendar.YEAR, -1);
-        else if ("Aylık".equals(storageValue)) reminder.add(Calendar.MONTH, -1);
-        else if ("Haftalık".equals(storageValue)) reminder.add(Calendar.DAY_OF_MONTH, -7);
-        else reminder.add(Calendar.DAY_OF_MONTH, -1);
     }
 
     private void showEditDialog(ExpenseItem existing, boolean defaultMonthly) {
@@ -3504,31 +3727,47 @@ private String getLanguageCode() {
             if (item.isPaidFor(due.get(Calendar.YEAR), due.get(Calendar.MONTH))) {
                 continue;
             }
-            Calendar remindAt = (Calendar) due.clone();
-            moveToReminderDate(remindAt, item.reminderFrequency);
-            remindAt.set(Calendar.HOUR_OF_DAY, 9);
-            remindAt.set(Calendar.MINUTE, 0);
-            remindAt.set(Calendar.SECOND, 0);
-            if (remindAt.before(now)) {
-                remindAt = (Calendar) due.clone();
+            int leadDays = reminderLeadDays(item.reminderFrequency);
+            double amount = item.amountForMonth(due.get(Calendar.YEAR), due.get(Calendar.MONTH));
+            for (int dayOffset = leadDays; dayOffset >= 0; dayOffset--) {
+                Calendar remindAt = (Calendar) due.clone();
+                remindAt.add(Calendar.DAY_OF_MONTH, -dayOffset);
                 remindAt.set(Calendar.HOUR_OF_DAY, 9);
                 remindAt.set(Calendar.MINUTE, 0);
+                remindAt.set(Calendar.SECOND, 0);
+                if (remindAt.before(now)) {
+                    continue;
+                }
+                Intent intent = new Intent(this, PaymentReminderReceiver.class);
+                intent.putExtra(PaymentReminderReceiver.EXTRA_TITLE, reminderTitle(item, due, amount));
+                intent.putExtra(PaymentReminderReceiver.EXTRA_MESSAGE, reminderMessage(item, due, amount));
+                intent.putExtra(PaymentReminderReceiver.EXTRA_ITEMS_KEY, currentItemsKey());
+                intent.putExtra(PaymentReminderReceiver.EXTRA_ITEM_ID, item.id);
+                intent.putExtra(PaymentReminderReceiver.EXTRA_DUE_YEAR, due.get(Calendar.YEAR));
+                intent.putExtra(PaymentReminderReceiver.EXTRA_DUE_MONTH, due.get(Calendar.MONTH));
+                intent.putExtra(PaymentReminderReceiver.EXTRA_DAY_OFFSET, dayOffset);
+                intent.putExtra(PaymentReminderReceiver.EXTRA_NOTIFICATION_ID, reminderNotificationId(item, due));
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                        this,
+                        reminderRequestCode(item, dayOffset),
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
+                alarmManager.set(AlarmManager.RTC_WAKEUP, remindAt.getTimeInMillis(), pendingIntent);
             }
-            if (remindAt.before(now)) {
-                continue;
-            }
-            double amount = item.amountForMonth(due.get(Calendar.YEAR), due.get(Calendar.MONTH));
-            Intent intent = new Intent(this, PaymentReminderReceiver.class);
-            intent.putExtra(PaymentReminderReceiver.EXTRA_TITLE, reminderTitle(item, due, amount));
-            intent.putExtra(PaymentReminderReceiver.EXTRA_MESSAGE, reminderMessage(item, due, amount));
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                    this,
-                    (int) item.id,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-            );
-            alarmManager.set(AlarmManager.RTC_WAKEUP, remindAt.getTimeInMillis(), pendingIntent);
         }
+    }
+
+    private int reminderRequestCode(ExpenseItem item, int dayOffset) {
+        long value = Math.abs(item.id) * 10L + dayOffset;
+        return (int) (value % Integer.MAX_VALUE);
+    }
+
+    private int reminderNotificationId(ExpenseItem item, Calendar due) {
+        long value = Math.abs(item.id);
+        value = value * 31L + due.get(Calendar.YEAR);
+        value = value * 31L + due.get(Calendar.MONTH);
+        return (int) (value % Integer.MAX_VALUE);
     }
 
     private void requestNotificationPermissionIfNeeded() {
@@ -4496,12 +4735,26 @@ private String getLanguageCode() {
         TextView cell = text(inMonth ? String.valueOf(day) + marker : "", 14, COLOR_TEXT, Typeface.BOLD);
         cell.setGravity(Gravity.CENTER);
         if (inMonth && day == selectedCalendarDay) {
-            cell.setTextColor(Color.WHITE);
-            cell.setBackground(round(COLOR_PRIMARY_CONTAINER, dp(12), 0));
+            ExpenseItem firstItem = firstItemOnDay(day, now);
+            String service = firstItem == null ? "" : serviceKey(firstItem.name);
+            if (!service.isEmpty()) {
+                cell.setTextColor(serviceBrandTextColor(service));
+                cell.setBackground(round(serviceBrandColor(service, COLOR_PRIMARY_CONTAINER), dp(12), 0));
+            } else {
+                cell.setTextColor(Color.WHITE);
+                cell.setBackground(round(COLOR_PRIMARY_CONTAINER, dp(12), 0));
+            }
         } else if (inMonth && hasPaymentOnDay(day, now)) {
-            String category = firstCategoryOnDay(day, now);
-            cell.setTextColor(categoryTextColor(category));
-            cell.setBackground(round(categoryTint(category), dp(12), 0));
+            ExpenseItem firstItem = firstItemOnDay(day, now);
+            String service = firstItem == null ? "" : serviceKey(firstItem.name);
+            if (!service.isEmpty()) {
+                cell.setTextColor(serviceBrandTextColor(service));
+                cell.setBackground(round(serviceBrandColor(service, categoryTint(firstItem.category)), dp(12), 0));
+            } else {
+                String category = firstItem == null ? firstCategoryOnDay(day, now) : firstItem.category;
+                cell.setTextColor(categoryTextColor(category));
+                cell.setBackground(round(categoryTint(category), dp(12), 0));
+            }
         }
         if (inMonth) {
             cell.setOnClickListener(v -> {
@@ -4531,11 +4784,19 @@ private String getLanguageCode() {
     }
 
     private String firstCategoryOnDay(int day, Calendar now) {
+        ExpenseItem item = firstItemOnDay(day, now);
+        if (item != null) {
+            return item.category;
+        }
+        return "Abonelik";
+    }
+
+    private ExpenseItem firstItemOnDay(int day, Calendar now) {
         List<ExpenseItem> dayItems = itemsForDay(day, now);
         if (dayItems.isEmpty()) {
-            return "Abonelik";
+            return null;
         }
-        return dayItems.get(0).category;
+        return dayItems.get(0);
     }
 
     private boolean hasPaymentOnDay(int day, Calendar now) {
@@ -4715,7 +4976,7 @@ private String getLanguageCode() {
 
     private CheckBox styledCheck(String title, String subtitle) {
         CheckBox checkBox = new CheckBox(this);
-        checkBox.setText(title + "\n" + subtitle);
+        checkBox.setText(subtitle == null || subtitle.trim().isEmpty() ? title : title + "\n" + subtitle);
         checkBox.setTextSize(16);
         checkBox.setTextColor(COLOR_TEXT);
         checkBox.setPadding(0, dp(12), 0, dp(12));
@@ -5273,6 +5534,41 @@ private String getLanguageCode() {
                 .trim();
     }
 
+    private int serviceBrandColor(String service, int fallback) {
+        if ("netflix".equals(service)) return Color.rgb(229, 9, 20);
+        if ("spotify".equals(service)) return Color.rgb(30, 215, 96);
+        if ("youtube".equals(service)) return Color.rgb(255, 0, 0);
+        if ("prime".equals(service)) return Color.rgb(0, 168, 225);
+        if ("amazon".equals(service)) return Color.rgb(255, 153, 0);
+        if ("bein".equals(service)) return Color.rgb(91, 45, 145);
+        if ("disney".equals(service)) return Color.rgb(17, 60, 134);
+        if ("apple".equals(service)) return Color.rgb(28, 28, 30);
+        if ("max".equals(service)) return Color.rgb(0, 87, 255);
+        if ("hulu".equals(service)) return Color.rgb(28, 231, 131);
+        if ("paramount".equals(service)) return Color.rgb(0, 72, 255);
+        if ("peacock".equals(service)) return Color.rgb(95, 42, 191);
+        if ("crunchyroll".equals(service)) return Color.rgb(244, 117, 33);
+        if ("now".equals(service)) return Color.rgb(0, 168, 154);
+        if ("britbox".equals(service)) return Color.rgb(14, 48, 98);
+        if ("dazn".equals(service)) return Color.rgb(18, 21, 24);
+        if ("wow".equals(service)) return Color.rgb(123, 63, 228);
+        if ("rtl".equals(service)) return Color.rgb(255, 0, 86);
+        if ("canal".equals(service)) return Color.rgb(20, 20, 20);
+        if ("chatgpt".equals(service)) return Color.rgb(16, 163, 127);
+        if ("exxen".equals(service)) return Color.rgb(255, 194, 0);
+        if ("tabii".equals(service)) return Color.rgb(0, 166, 108);
+        if ("tod".equals(service)) return Color.rgb(0, 123, 255);
+        if ("gain".equals(service)) return Color.rgb(244, 42, 65);
+        return fallback;
+    }
+
+    private int serviceBrandTextColor(String service) {
+        if ("spotify".equals(service) || "hulu".equals(service) || "amazon".equals(service) || "exxen".equals(service)) {
+            return Color.rgb(20, 30, 32);
+        }
+        return service == null || service.isEmpty() ? COLOR_PRIMARY : Color.WHITE;
+    }
+
     private TextView badge(String value, boolean paid) {
         TextView view = text(paid ? ui("Ödendi", "Paid") : value, 11, paid ? COLOR_PRIMARY : COLOR_ACCENT, Typeface.BOLD);
         view.setGravity(Gravity.CENTER);
@@ -5518,6 +5814,48 @@ private String getLanguageCode() {
         return nearest.name + ui(" tarifesi ", " plan ends in ") + nearestDays + ui(" gün içinde bitiyor.", " days.");
     }
 
+    private void logAnalyticsEvent(String eventName) {
+        logAnalyticsEvent(eventName, new String[0]);
+    }
+
+    private void logAnalyticsEvent(String eventName, String... keyValues) {
+        if (firebaseAnalytics == null || eventName == null || eventName.trim().isEmpty()) {
+            return;
+        }
+        Bundle bundle = new Bundle();
+        bundle.putString("country", currentCountryCode());
+        bundle.putString("language", getLanguageCode());
+        for (int i = 0; i + 1 < keyValues.length; i += 2) {
+            String key = safeAnalyticsName(keyValues[i]);
+            String value = keyValues[i + 1] == null ? "" : keyValues[i + 1];
+            if (!key.isEmpty()) {
+                bundle.putString(key, safeAnalyticsValue(value));
+            }
+        }
+        firebaseAnalytics.logEvent(safeAnalyticsName(eventName), bundle);
+    }
+
+    private String safeAnalyticsName(String value) {
+        if (value == null) {
+            return "";
+        }
+        String normalized = value.trim().toLowerCase(Locale.US).replaceAll("[^a-z0-9_]", "_");
+        if (normalized.length() > 40) {
+            return normalized.substring(0, 40);
+        }
+        return normalized;
+    }
+
+    private String safeAnalyticsValue(String value) {
+        String normalized = normalizeServiceText(value)
+                .replaceAll("[^a-z0-9_ğüşöçıİĞÜŞÖÇ\\- ]", "")
+                .trim();
+        if (normalized.length() > 80) {
+            return normalized.substring(0, 80);
+        }
+        return normalized;
+    }
+
     private int dp(int value) {
         return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
     }
@@ -5535,7 +5873,7 @@ private String getLanguageCode() {
         int paidMonth = -1;
         int paidYear = -1;
         boolean reminderEnabled = true;
-        String reminderFrequency = "Günlük";
+        String reminderFrequency = "1";
         boolean hasEndDate;
         int endDay = 1;
         int endMonth;
@@ -5706,7 +6044,7 @@ private String getLanguageCode() {
             item.paidMonth = object.optInt("paidMonth", item.paid ? item.month : -1);
             item.paidYear = object.optInt("paidYear", item.paid ? item.year : -1);
             item.reminderEnabled = object.optBoolean("reminderEnabled", true);
-            item.reminderFrequency = object.optString("reminderFrequency", "Günlük");
+            item.reminderFrequency = object.optString("reminderFrequency", "1");
             item.hasEndDate = object.optBoolean("hasEndDate", false);
             item.endDay = object.optInt("endDay", item.day);
             item.endMonth = object.optInt("endMonth", item.month);

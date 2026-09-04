@@ -42,6 +42,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -93,17 +94,17 @@ import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
 
 public class MainActivity extends Activity {
-    private static int COLOR_BG = Color.rgb(248, 249, 250);
+    private static int COLOR_BG = Color.rgb(245, 248, 251);
     private static int COLOR_SURFACE = Color.WHITE;
-    private static int COLOR_SURFACE_LOW = Color.rgb(243, 244, 245);
-    private static int COLOR_SURFACE_HIGH = Color.rgb(231, 232, 233);
-    private static int COLOR_TEXT = Color.rgb(25, 28, 29);
-    private static int COLOR_MUTED = Color.rgb(62, 73, 74);
-    private static int COLOR_PRIMARY = Color.rgb(0, 83, 91);
-    private static int COLOR_PRIMARY_CONTAINER = Color.rgb(0, 109, 119);
-    private static int COLOR_ACCENT = Color.rgb(137, 81, 0);
-    private static int COLOR_ACCENT_CONTAINER = Color.rgb(253, 157, 26);
-    private static int COLOR_LINE = Color.rgb(190, 200, 202);
+    private static int COLOR_SURFACE_LOW = Color.rgb(241, 245, 249);
+    private static int COLOR_SURFACE_HIGH = Color.rgb(230, 236, 244);
+    private static int COLOR_TEXT = Color.rgb(10, 25, 47);
+    private static int COLOR_MUTED = Color.rgb(82, 100, 121);
+    private static int COLOR_PRIMARY = Color.rgb(0, 117, 128);
+    private static int COLOR_PRIMARY_CONTAINER = Color.rgb(0, 124, 137);
+    private static int COLOR_ACCENT = Color.rgb(183, 111, 14);
+    private static int COLOR_ACCENT_CONTAINER = Color.rgb(255, 185, 91);
+    private static int COLOR_LINE = Color.rgb(218, 226, 235);
     private static final String PREFS = "subscription_tracker";
     private static final String KEY_ITEMS = "items";
     private static final String KEY_PROFILE_URI = "profile_uri";
@@ -573,19 +574,21 @@ public class MainActivity extends Activity {
     }
 
     private void buildHomeScreen() {
-        content.addView(topAppBar(ui("Abonelik Takibi", "Subscription Tracker"), true));
+        content.addView(homeGreetingBar());
+
+        content.addView(monthHeroCard());
 
         LinearLayout stats = new LinearLayout(this);
         stats.setOrientation(LinearLayout.HORIZONTAL);
         stats.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
-        totalText = statCard(stats, ui("BU AY\nTOPLAM", "THIS MONTH\nTOTAL"), COLOR_PRIMARY);
-        paidText = statCard(stats, ui("ÖDENEN", "PAID"), COLOR_PRIMARY_CONTAINER);
-        upcomingText = statCard(stats, ui("KALAN", "LEFT"), COLOR_ACCENT);
+        totalText = statCard(stats, ui("Toplam", "Total"), COLOR_TEXT);
+        paidText = statCard(stats, ui("Ödenen", "Paid"), COLOR_TEXT);
+        upcomingText = statCard(stats, ui("Kalan", "Left"), COLOR_TEXT);
         content.addView(stats);
 
-        Button addRecord = primaryButton("+  " + ui("Yeni Kayıt", "New Record"));
+        Button addRecord = primaryButton("+  " + ui("Abonelik Ekle", "Add Subscription"));
         addRecord.setOnClickListener(v -> {
             logAnalyticsEvent("home_new_record_clicked", "source", "main_button");
             openRecordScreen(null);
@@ -594,7 +597,7 @@ public class MainActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 dp(56)
         );
-        addParams.setMargins(0, dp(20), 0, dp(24));
+        addParams.setMargins(0, dp(12), 0, dp(20));
         content.addView(addRecord, addParams);
 
         if (items.isEmpty()) {
@@ -618,6 +621,87 @@ public class MainActivity extends Activity {
         content.addView(smartInsightCard());
         content.addView(homeCampaignStrip());
         render();
+    }
+
+    private View homeGreetingBar() {
+        LinearLayout bar = new LinearLayout(this);
+        bar.setGravity(Gravity.CENTER_VERTICAL);
+        bar.setPadding(0, dp(12), 0, dp(10));
+
+        LinearLayout copy = new LinearLayout(this);
+        copy.setOrientation(LinearLayout.VERTICAL);
+        copy.addView(text(ui("Merhaba", "Hello"), 12, COLOR_TEXT, Typeface.BOLD));
+        TextView name = text(displayFirstName(), 22, COLOR_TEXT, Typeface.BOLD);
+        name.setPadding(0, dp(1), 0, 0);
+        copy.addView(name);
+        TextView subtitle = text(ui("Aboneliklerini bugün de kontrol altında.", "Your subscriptions are under control today."), 13, COLOR_MUTED, Typeface.NORMAL);
+        subtitle.setPadding(0, dp(5), 0, 0);
+        copy.addView(subtitle);
+        bar.addView(copy, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+
+        TextView bell = iconBox("!", Color.rgb(232, 248, 250), COLOR_PRIMARY);
+        bell.setTextSize(18);
+        bar.addView(bell, new LinearLayout.LayoutParams(dp(42), dp(42)));
+        return bar;
+    }
+
+    private String displayFirstName() {
+        String name = getUserName();
+        if (name == null || name.trim().isEmpty()) {
+            return "Dursun";
+        }
+        String clean = name.trim();
+        int space = clean.indexOf(' ');
+        return space > 0 ? clean.substring(0, space) : clean;
+    }
+
+    private View monthHeroCard() {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(18), dp(16), dp(18), dp(16));
+        card.setBackground(round(COLOR_PRIMARY_CONTAINER, dp(14), 0));
+        card.setElevation(dp(5));
+
+        LinearLayout top = new LinearLayout(this);
+        top.setGravity(Gravity.CENTER_VERTICAL);
+        top.addView(text(new SimpleDateFormat("MMMM yyyy", appLocale()).format(Calendar.getInstance().getTime()), 16, Color.WHITE, Typeface.BOLD),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        TextView delta = text("↑ " + compactMoney(Math.max(0, totalForMonth(Calendar.getInstance()) - totalForPreviousMonth())), 11, Color.WHITE, Typeface.BOLD);
+        delta.setGravity(Gravity.CENTER);
+        delta.setPadding(dp(10), dp(6), dp(10), dp(6));
+        delta.setBackground(round(Color.argb(46, 255, 255, 255), dp(14), 0));
+        top.addView(delta);
+        card.addView(top);
+
+        double total = totalForMonth(Calendar.getInstance());
+        TextView amount = text(money(total), 30, Color.WHITE, Typeface.BOLD);
+        amount.setPadding(0, dp(10), 0, 0);
+        card.addView(amount);
+        card.addView(text(items.size() + ui(" aktif abonelik", " active subscriptions"), 14, Color.rgb(226, 250, 252), Typeface.BOLD));
+
+        LinearLayout bars = new LinearLayout(this);
+        bars.setGravity(Gravity.BOTTOM | Gravity.RIGHT);
+        bars.setPadding(0, dp(10), 0, 0);
+        for (int i = 0; i < 8; i++) {
+            View bar = new View(this);
+            bar.setBackground(round(Color.argb(i == 7 ? 180 : 90, 255, 255, 255), dp(4), 0));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(7), dp(16 + i * 4));
+            params.setMargins(dp(5), 0, 0, 0);
+            bars.addView(bar, params);
+        }
+        card.addView(bars, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(54)));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, dp(4), 0, dp(12));
+        card.setLayoutParams(params);
+        return card;
+    }
+
+    private double totalForPreviousMonth() {
+        Calendar previous = Calendar.getInstance();
+        previous.set(Calendar.DAY_OF_MONTH, 1);
+        previous.add(Calendar.MONTH, -1);
+        return totalForMonth(previous);
     }
 
     private View homeCampaignStrip() {
@@ -1045,34 +1129,44 @@ private String getLanguageCode() {
     }
 
     private void buildLoginScreen() {
-        content.setPadding(dp(24), dp(26), dp(24), dp(18));
-        content.setBackgroundColor(Color.rgb(249, 249, 252));
+        content.setPadding(dp(24), dp(22), dp(24), dp(18));
+        content.setBackgroundColor(COLOR_BG);
 
         LinearLayout brand = new LinearLayout(this);
         brand.setGravity(Gravity.CENTER);
-        brand.setOrientation(LinearLayout.HORIZONTAL);
-        brand.addView(appMarkIcon(), new LinearLayout.LayoutParams(dp(58), dp(58)));
-        TextView brandName = text("Abonelik Takibi", 25, COLOR_PRIMARY, Typeface.BOLD);
-        brandName.setLetterSpacing(-0.015f);
+        brand.setOrientation(LinearLayout.VERTICAL);
+        brand.addView(appMarkIcon(), new LinearLayout.LayoutParams(dp(70), dp(70)));
+        TextView brandName = text("Abonelik Takibi", 26, COLOR_PRIMARY, Typeface.BOLD);
+        brandName.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams brandNameParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        brandNameParams.setMargins(dp(16), 0, 0, 0);
+        brandNameParams.setMargins(0, dp(10), 0, 0);
         brand.addView(brandName, brandNameParams);
+        TextView tagline = text(ui("Daha bilinçli harca, kontrol sende.", "Spend smarter, stay in control."), 15, COLOR_MUTED, Typeface.NORMAL);
+        tagline.setGravity(Gravity.CENTER);
+        tagline.setPadding(0, dp(6), 0, 0);
+        brand.addView(tagline);
         content.addView(brand, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
 
-        SpaceLike(dp(82));
+        SpaceLike(dp(48));
 
-        TextView headline = text(ui("Finansal\nözgürlüğünü\nkontrol altına al.", "Take control of\nyour financial\nfreedom."), 31, COLOR_TEXT, Typeface.BOLD);
+        TextView headline = text(ui("Finansal özgürlüğünü\nkontrol altına al.", "Take control of your\nfinancial freedom."), 34, COLOR_TEXT, Typeface.BOLD);
         headline.setGravity(Gravity.CENTER);
-        headline.setLineSpacing(dp(2), 0.98f);
-        headline.setLetterSpacing(-0.02f);
-        headline.setPadding(0, 0, 0, dp(34));
+        headline.setLineSpacing(dp(2), 1.0f);
+        headline.setPadding(0, 0, 0, dp(18));
         content.addView(headline, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        TextView copy = text(ui("Tüm aboneliklerini tek yerde yönet,\nödeme günlerini kaçırma.", "Manage every subscription in one place,\nand never miss a payment."), 17, COLOR_MUTED, Typeface.NORMAL);
+        copy.setGravity(Gravity.CENTER);
+        copy.setPadding(0, 0, 0, dp(34));
+        content.addView(copy);
+
+        content.addView(loginFeatureRow(), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(96)));
 
         LinearLayout panel = new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
@@ -1083,7 +1177,7 @@ private String getLanguageCode() {
                 ui("Google ile Devam Et", "Continue with Google"),
                 ui("Google hesabınla güvenli giriş", "Secure sign-in with your Google account"),
                 googleIconView(dp(48)),
-                false
+                true
         );
         google.setOnClickListener(v -> openGoogleAccountPicker());
         LinearLayout.LayoutParams googleParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(78));
@@ -1091,6 +1185,28 @@ private String getLanguageCode() {
         panel.addView(google, googleParams);
 
         content.addView(panel, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    }
+
+    private View loginFeatureRow() {
+        LinearLayout row = new LinearLayout(this);
+        row.setGravity(Gravity.CENTER);
+        row.addView(loginFeature("▥", ui("Aylık giderlerini\ngörselleştir", "Visualize monthly\nspending")), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+        row.addView(loginFeature("!", ui("Ödeme günlerinde\nhatırlatıcı al", "Get payment\nreminders")), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+        row.addView(loginFeature("✓", ui("Verilerin güvende\nkalsın", "Keep your data\nsafe")), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+        return row;
+    }
+
+    private View loginFeature(String iconText, String labelText) {
+        LinearLayout feature = new LinearLayout(this);
+        feature.setOrientation(LinearLayout.VERTICAL);
+        feature.setGravity(Gravity.CENTER);
+        TextView icon = iconBox(iconText, Color.rgb(224, 247, 249), COLOR_PRIMARY);
+        feature.addView(icon, new LinearLayout.LayoutParams(dp(44), dp(44)));
+        TextView label = text(labelText, 12, COLOR_MUTED, Typeface.NORMAL);
+        label.setGravity(Gravity.CENTER);
+        label.setPadding(0, dp(8), 0, 0);
+        feature.addView(label);
+        return feature;
     }
 
     private View premiumAuthButton(String title, String subtitle, View icon, boolean filled) {
@@ -1586,7 +1702,7 @@ private String getLanguageCode() {
     }
 
     private void buildCategoriesScreen() {
-        content.addView(topAppBar(ui("Kategoriler", "Categories"), false));
+        content.addView(topAppBar(ui("Analiz", "Analysis"), false));
         content.addView(monthlyReportPanel());
         content.addView(summaryChips());
         String selectedMonthTitle = new SimpleDateFormat("MMMM yyyy", appLocale()).format(selectedReportMonth.getTime());
@@ -2062,36 +2178,53 @@ private String getLanguageCode() {
         LinearLayout card = formCard();
         LinearLayout titleRow = new LinearLayout(this);
         titleRow.setGravity(Gravity.CENTER_VERTICAL);
-        titleRow.addView(text(ui("POPÜLER HİZMETLER", "POPULAR SERVICES"), 15, COLOR_TEXT, Typeface.BOLD),
+        titleRow.addView(text(ui("Abonelik Ekle", "Add Subscription"), 20, COLOR_TEXT, Typeface.BOLD),
                 new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        titleRow.addView(text(currentCountryLabel(), 13, COLOR_PRIMARY, Typeface.BOLD));
+        titleRow.addView(text(currentCountryLabel(), 12, COLOR_PRIMARY, Typeface.BOLD));
         card.addView(titleRow);
+        TextView hint = text(ui("Servis seç veya manuel devam et.", "Choose a service or continue manually."), 13, COLOR_MUTED, Typeface.NORMAL);
+        hint.setPadding(0, dp(6), 0, dp(14));
+        card.addView(hint);
 
         String[] services = popularServicesForCountry();
-        HorizontalScrollView scroll = new HorizontalScrollView(this);
-        scroll.setHorizontalScrollBarEnabled(false);
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
+        GridLayout grid = new GridLayout(this);
+        grid.setColumnCount(3);
         for (String service : services) {
-            String key = serviceKey(service);
-            int chipColor = serviceBrandColor(key, Color.rgb(226, 244, 246));
-            int chipText = serviceBrandTextColor(key);
-            TextView chip = text(service, 13, chipText, Typeface.BOLD);
-            chip.setGravity(Gravity.CENTER);
-            chip.setPadding(dp(16), 0, dp(16), 0);
-            chip.setBackground(round(chipColor, dp(20), 0));
-            chip.setOnClickListener(v -> {
+            LinearLayout tile = serviceTile(service);
+            tile.setOnClickListener(v -> {
                 logAnalyticsEvent("popular_service_selected", "service", serviceKey(service));
                 showServicePlans(service, name, amount);
             });
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, dp(44));
-            params.setMargins(0, 0, dp(10), 0);
-            row.addView(chip, params);
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.width = 0;
+            params.height = dp(86);
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            params.setMargins(dp(4), dp(4), dp(4), dp(8));
+            grid.addView(tile, params);
         }
-        scroll.addView(row);
-        card.addView(scroll);
+        card.addView(grid, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         return card;
+    }
+
+    private LinearLayout serviceTile(String service) {
+        LinearLayout tile = new LinearLayout(this);
+        tile.setOrientation(LinearLayout.VERTICAL);
+        tile.setGravity(Gravity.CENTER);
+        tile.setPadding(dp(8), dp(8), dp(8), dp(8));
+        tile.setBackground(cardBg());
+        tile.setElevation(dp(2));
+
+        View logo = serviceLogo(serviceKey(service), "Abonelik");
+        tile.addView(logo, new LinearLayout.LayoutParams(dp(36), dp(36)));
+        TextView label = text(service, 11, COLOR_TEXT, Typeface.BOLD);
+        label.setGravity(Gravity.CENTER);
+        label.setSingleLine(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            label.setAutoSizeTextTypeUniformWithConfiguration(9, 11, 1, TypedValue.COMPLEX_UNIT_SP);
+        }
+        label.setPadding(0, dp(7), 0, 0);
+        tile.addView(label, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return tile;
     }
 
     private void showServicePlans(String service, EditText name, EditText amount) {
@@ -5323,23 +5456,26 @@ private String getLanguageCode() {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
-        card.setPadding(dp(8), dp(10), dp(8), dp(10));
+        card.setPadding(dp(12), dp(10), dp(12), dp(10));
         card.setBackground(cardBg());
-        card.setElevation(dp(2));
-        TextView labelView = text(label, 10, COLOR_MUTED, Typeface.BOLD);
-        labelView.setGravity(Gravity.CENTER);
+        card.setElevation(dp(3));
+        TextView icon = iconBox(label.length() > 0 ? label.substring(0, 1) : "•", Color.rgb(232, 248, 250), COLOR_PRIMARY);
+        card.addView(icon, new LinearLayout.LayoutParams(dp(30), dp(30)));
+        TextView labelView = text(label, 11, COLOR_MUTED, Typeface.BOLD);
+        labelView.setGravity(Gravity.LEFT);
         labelView.setSingleLine(false);
         TextView value = text("", 17, color, Typeface.BOLD);
-        value.setGravity(Gravity.CENTER);
+        value.setGravity(Gravity.LEFT);
         value.setSingleLine(true);
         value.setMaxLines(1);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             value.setAutoSizeTextTypeUniformWithConfiguration(11, 17, 1, TypedValue.COMPLEX_UNIT_SP);
         }
-        value.setPadding(0, dp(6), 0, 0);
+        labelView.setPadding(0, dp(8), 0, 0);
+        value.setPadding(0, dp(4), 0, 0);
         card.addView(labelView);
         card.addView(value);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(86), 1);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(100), 1);
         params.setMargins(0, 0, parent.getChildCount() < 2 ? dp(8) : 0, dp(2));
         parent.addView(card, params);
         return value;
@@ -5399,8 +5535,8 @@ private String getLanguageCode() {
         editText.setSingleLine(true);
         editText.setTextColor(COLOR_TEXT);
         editText.setHintTextColor(COLOR_MUTED);
-        editText.setPadding(dp(12), dp(8), dp(12), dp(8));
-        editText.setBackground(round(COLOR_SURFACE, dp(8), COLOR_LINE));
+        editText.setPadding(dp(14), dp(8), dp(14), dp(8));
+        editText.setBackground(round(Color.rgb(250, 252, 255), dp(10), COLOR_LINE));
         return editText;
     }
 
@@ -5421,6 +5557,7 @@ private String getLanguageCode() {
         button.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         button.setAllCaps(false);
         button.setBackground(round(COLOR_PRIMARY_CONTAINER, dp(12), 0));
+        button.setElevation(dp(3));
         return button;
     }
 
@@ -5453,7 +5590,7 @@ private String getLanguageCode() {
     }
 
     private GradientDrawable cardBg() {
-        return round(COLOR_SURFACE, dp(12), Color.rgb(229, 231, 235));
+        return round(COLOR_SURFACE, dp(10), Color.rgb(235, 239, 245));
     }
 
     private GradientDrawable round(int color, int radius, int strokeColor) {
@@ -5634,12 +5771,13 @@ private String getLanguageCode() {
         LinearLayout nav = new LinearLayout(this);
         nav.setOrientation(LinearLayout.HORIZONTAL);
         nav.setGravity(Gravity.CENTER);
-        nav.setPadding(dp(12), dp(8), dp(12), dp(8) + systemBottomInset);
+        nav.setPadding(dp(8), dp(6), dp(8), dp(6) + systemBottomInset);
         nav.setBackground(round(COLOR_SURFACE, dp(0), Color.rgb(229, 231, 235)));
         nav.setElevation(dp(8));
-        nav.addView(navItem(ui("Ana Sayfa", "Home"), SCREEN_HOME, R.drawable.ic_nav_home), new LinearLayout.LayoutParams(0, dp(56), 1));
-        nav.addView(navItem(ui("Kategoriler", "Categories"), SCREEN_CATEGORIES, R.drawable.ic_nav_categories), new LinearLayout.LayoutParams(0, dp(56), 1));
-        nav.addView(navItem(ui("Takvim", "Calendar"), SCREEN_CALENDAR, R.drawable.ic_nav_calendar), new LinearLayout.LayoutParams(0, dp(56), 1));
+        nav.addView(navItem(ui("Ana Sayfa", "Home"), SCREEN_HOME, R.drawable.ic_nav_home), new LinearLayout.LayoutParams(0, dp(58), 1));
+        nav.addView(navItem(ui("Takvim", "Calendar"), SCREEN_CALENDAR, R.drawable.ic_nav_calendar), new LinearLayout.LayoutParams(0, dp(58), 1));
+        nav.addView(navItem(ui("Analiz", "Analysis"), SCREEN_CATEGORIES, R.drawable.ic_nav_categories), new LinearLayout.LayoutParams(0, dp(58), 1));
+        nav.addView(navItem(ui("Ayarlar", "Settings"), SCREEN_SETTINGS, R.drawable.ic_nav_categories), new LinearLayout.LayoutParams(0, dp(58), 1));
         return nav;
     }
 
@@ -5648,10 +5786,10 @@ private String getLanguageCode() {
         int color = active ? COLOR_PRIMARY : COLOR_MUTED;
 
         LinearLayout item = new LinearLayout(this);
-        item.setOrientation(LinearLayout.HORIZONTAL);
+        item.setOrientation(LinearLayout.VERTICAL);
         item.setGravity(Gravity.CENTER);
-        item.setPadding(dp(10), 0, dp(10), 0);
-        item.setBackground(active ? round(Color.rgb(226, 244, 246), dp(18), 0) : null);
+        item.setPadding(dp(4), dp(4), dp(4), dp(2));
+        item.setBackground(null);
         item.setOnClickListener(v -> showScreen(screen));
 
         ImageView icon = new ImageView(this);
@@ -5661,11 +5799,11 @@ private String getLanguageCode() {
             drawable.setTint(color);
         }
         icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(18), dp(18));
-        iconParams.setMargins(0, 0, dp(7), 0);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(22), dp(22));
+        iconParams.setMargins(0, 0, 0, dp(4));
         item.addView(icon, iconParams);
 
-        TextView labelView = text(label, 12, color, Typeface.BOLD);
+        TextView labelView = text(label, 11, color, active ? Typeface.BOLD : Typeface.NORMAL);
         labelView.setGravity(Gravity.CENTER);
         labelView.setSingleLine(true);
         item.addView(labelView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -5677,9 +5815,10 @@ private String getLanguageCode() {
             return;
         }
         bottomNav.removeAllViews();
-        bottomNav.addView(navItem(ui("Ana Sayfa", "Home"), SCREEN_HOME, R.drawable.ic_nav_home), new LinearLayout.LayoutParams(0, dp(56), 1));
-        bottomNav.addView(navItem(ui("Kategoriler", "Categories"), SCREEN_CATEGORIES, R.drawable.ic_nav_categories), new LinearLayout.LayoutParams(0, dp(56), 1));
-        bottomNav.addView(navItem(ui("Takvim", "Calendar"), SCREEN_CALENDAR, R.drawable.ic_nav_calendar), new LinearLayout.LayoutParams(0, dp(56), 1));
+        bottomNav.addView(navItem(ui("Ana Sayfa", "Home"), SCREEN_HOME, R.drawable.ic_nav_home), new LinearLayout.LayoutParams(0, dp(58), 1));
+        bottomNav.addView(navItem(ui("Takvim", "Calendar"), SCREEN_CALENDAR, R.drawable.ic_nav_calendar), new LinearLayout.LayoutParams(0, dp(58), 1));
+        bottomNav.addView(navItem(ui("Analiz", "Analysis"), SCREEN_CATEGORIES, R.drawable.ic_nav_categories), new LinearLayout.LayoutParams(0, dp(58), 1));
+        bottomNav.addView(navItem(ui("Ayarlar", "Settings"), SCREEN_SETTINGS, R.drawable.ic_nav_categories), new LinearLayout.LayoutParams(0, dp(58), 1));
     }
 
     private FrameLayout.LayoutParams bottomNavParams() {
@@ -5696,7 +5835,7 @@ private String getLanguageCode() {
         if (bottomNav == null) {
             return;
         }
-        bottomNav.setPadding(dp(12), dp(8), dp(12), dp(8) + systemBottomInset);
+        bottomNav.setPadding(dp(8), dp(6), dp(8), dp(6) + systemBottomInset);
         ViewGroup.LayoutParams params = bottomNav.getLayoutParams();
         if (params != null) {
             params.height = bottomNavHeight();

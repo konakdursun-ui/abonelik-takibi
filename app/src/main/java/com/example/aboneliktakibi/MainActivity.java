@@ -115,6 +115,7 @@ public class MainActivity extends Activity {
     private static final String KEY_LANGUAGE = "language";
     private static final String KEY_COUNTRY = "country";
     private static final String KEY_COUNTRY_PROMPT_COMPLETED = "country_prompt_completed";
+    private static final String KEY_ONBOARDING_COMPLETED = "onboarding_completed_v1";
     private static final String KEY_NOTIFICATIONS = "notifications";
     private static final String KEY_LOGGED_IN = "logged_in";
     private static final String KEY_AUTH_EMAIL = "auth_email";
@@ -141,6 +142,7 @@ public class MainActivity extends Activity {
     private static final int SCREEN_SIGNUP = 6;
     private static final int SCREEN_EMAIL_LOGIN = 7;
     private static final int SCREEN_CAMPAIGNS = 8;
+    private static final int SCREEN_ONBOARDING = 9;
     private static final int TOP_AVATAR_SIZE_DP = 48;
     private static final String[] CATEGORIES = {
             "Abonelik", "Elektrik", "Su", "Doğalgaz", "İnternet", "Telefon", "Kira", "Ulaşım", "Diğer"
@@ -428,7 +430,7 @@ public class MainActivity extends Activity {
         setContentView(createContentView());
         registerSystemBackNavigation();
         suppressScreenHistory = true;
-        showScreen(isLoggedIn() ? SCREEN_HOME : SCREEN_LOGIN);
+        showScreen(startScreen());
         suppressScreenHistory = false;
         if (pendingCloudLoad) {
             pendingCloudLoad = false;
@@ -439,6 +441,25 @@ public class MainActivity extends Activity {
             scheduleReminders();
         }
         logAnalyticsEvent("app_open_local");
+    }
+
+    private int startScreen() {
+        if (isLoggedIn()) {
+            return SCREEN_HOME;
+        }
+        return hasCompletedOnboarding() ? SCREEN_LOGIN : SCREEN_ONBOARDING;
+    }
+
+    private boolean hasCompletedOnboarding() {
+        return getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(KEY_ONBOARDING_COMPLETED, false);
+    }
+
+    private void completeOnboarding() {
+        getSharedPreferences(PREFS, MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_ONBOARDING_COMPLETED, true)
+                .apply();
+        showScreen(SCREEN_LOGIN);
     }
 
     private void showStartupFallback(Throwable throwable) {
@@ -473,7 +494,7 @@ public class MainActivity extends Activity {
                 try {
                     setContentView(createContentView());
                     registerSystemBackNavigation();
-                    showScreen(SCREEN_LOGIN);
+                showScreen(startScreen());
                 } catch (Throwable ignored) {
                     Toast.makeText(this, ui("Uygulama güvenli modda kaldı.", "The app remained in safe mode."), Toast.LENGTH_SHORT).show();
                 }
@@ -542,6 +563,8 @@ public class MainActivity extends Activity {
             buildSettingsScreen();
         } else if (screen == SCREEN_LOGIN) {
             buildLoginScreen();
+        } else if (screen == SCREEN_ONBOARDING) {
+            buildOnboardingScreen();
         } else if (screen == SCREEN_SIGNUP) {
             buildSignupScreen();
         } else if (screen == SCREEN_EMAIL_LOGIN) {
@@ -552,14 +575,14 @@ public class MainActivity extends Activity {
             buildRecordScreen();
         }
         if (bottomNav != null) {
-            boolean authScreen = screen == SCREEN_LOGIN || screen == SCREEN_SIGNUP || screen == SCREEN_EMAIL_LOGIN;
+            boolean authScreen = screen == SCREEN_LOGIN || screen == SCREEN_SIGNUP || screen == SCREEN_EMAIL_LOGIN || screen == SCREEN_ONBOARDING;
             bottomNav.setVisibility((screen == SCREEN_RECORD || authScreen) ? View.GONE : View.VISIBLE);
         }
         refreshBottomNav();
     }
 
     private void applyScreenLayout(int screen) {
-        boolean authScreen = screen == SCREEN_LOGIN || screen == SCREEN_SIGNUP || screen == SCREEN_EMAIL_LOGIN;
+        boolean authScreen = screen == SCREEN_LOGIN || screen == SCREEN_SIGNUP || screen == SCREEN_EMAIL_LOGIN || screen == SCREEN_ONBOARDING;
         boolean fullScreen = screen == SCREEN_RECORD || authScreen;
         if (mainScrollView != null) {
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mainScrollView.getLayoutParams();
@@ -568,8 +591,28 @@ public class MainActivity extends Activity {
         }
         if (screen == SCREEN_RECORD) {
             content.setPadding(dp(16), dp(8), dp(16), dp(96));
+            content.setGravity(Gravity.NO_GRAVITY);
+            ViewGroup.LayoutParams childParams = content.getLayoutParams();
+            if (childParams != null) {
+                childParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                content.setLayoutParams(childParams);
+            }
+        } else if (authScreen) {
+            content.setPadding(dp(22), dp(12), dp(22), dp(12));
+            content.setGravity(Gravity.CENTER_HORIZONTAL);
+            ViewGroup.LayoutParams childParams = content.getLayoutParams();
+            if (childParams != null) {
+                childParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                content.setLayoutParams(childParams);
+            }
         } else if (!authScreen) {
             content.setPadding(dp(16), dp(8), dp(16), bottomContentPadding(true));
+            content.setGravity(Gravity.NO_GRAVITY);
+            ViewGroup.LayoutParams childParams = content.getLayoutParams();
+            if (childParams != null) {
+                childParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                content.setLayoutParams(childParams);
+            }
         }
     }
 
@@ -1129,14 +1172,20 @@ private String getLanguageCode() {
     }
 
     private void buildLoginScreen() {
-        content.setPadding(dp(24), dp(22), dp(24), dp(18));
+        content.setPadding(dp(22), dp(12), dp(22), dp(12));
         content.setBackgroundColor(COLOR_BG);
+        content.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        TextView skip = text(ui("Atla", "Skip"), 16, COLOR_PRIMARY, Typeface.BOLD);
+        skip.setGravity(Gravity.RIGHT);
+        skip.setOnClickListener(v -> completeLogin(ui("Misafir", "Guest"), ""));
+        content.addView(skip, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(34)));
 
         LinearLayout brand = new LinearLayout(this);
         brand.setGravity(Gravity.CENTER);
         brand.setOrientation(LinearLayout.VERTICAL);
-        brand.addView(appMarkIcon(), new LinearLayout.LayoutParams(dp(70), dp(70)));
-        TextView brandName = text("Abonelik Takibi", 26, COLOR_PRIMARY, Typeface.BOLD);
+        brand.addView(appMarkIcon(), new LinearLayout.LayoutParams(dp(56), dp(56)));
+        TextView brandName = text("Abonelik Takibi", 24, COLOR_PRIMARY, Typeface.BOLD);
         brandName.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams brandNameParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -1144,7 +1193,7 @@ private String getLanguageCode() {
         );
         brandNameParams.setMargins(0, dp(10), 0, 0);
         brand.addView(brandName, brandNameParams);
-        TextView tagline = text(ui("Daha bilinçli harca, kontrol sende.", "Spend smarter, stay in control."), 15, COLOR_MUTED, Typeface.NORMAL);
+        TextView tagline = text(ui("Daha bilinçli harca, kontrol sende.", "Spend smarter, stay in control."), 14, COLOR_MUTED, Typeface.NORMAL);
         tagline.setGravity(Gravity.CENTER);
         tagline.setPadding(0, dp(6), 0, 0);
         brand.addView(tagline);
@@ -1153,20 +1202,22 @@ private String getLanguageCode() {
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
 
-        SpaceLike(dp(48));
+        SpaceLike(dp(22));
 
-        TextView headline = text(ui("Finansal özgürlüğünü\nkontrol altına al.", "Take control of your\nfinancial freedom."), 34, COLOR_TEXT, Typeface.BOLD);
+        TextView headline = text(ui("Finansal özgürlüğünü\nkontrol altına al.", "Take control of your\nfinancial freedom."), 28, COLOR_TEXT, Typeface.BOLD);
         headline.setGravity(Gravity.CENTER);
-        headline.setLineSpacing(dp(2), 1.0f);
-        headline.setPadding(0, 0, 0, dp(18));
+        headline.setLineSpacing(dp(1), 1.0f);
+        headline.setPadding(0, 0, 0, dp(10));
         content.addView(headline, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        TextView copy = text(ui("Tüm aboneliklerini tek yerde yönet,\nödeme günlerini kaçırma.", "Manage every subscription in one place,\nand never miss a payment."), 17, COLOR_MUTED, Typeface.NORMAL);
+        TextView copy = text(ui("Tüm aboneliklerini tek yerde yönet,\nödeme günlerini kaçırma.", "Manage every subscription in one place,\nand never miss a payment."), 15, COLOR_MUTED, Typeface.NORMAL);
         copy.setGravity(Gravity.CENTER);
-        copy.setPadding(0, 0, 0, dp(34));
+        copy.setPadding(0, 0, 0, dp(12));
         content.addView(copy);
 
-        content.addView(loginFeatureRow(), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(96)));
+        content.addView(subscriptionMockupHero(), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(208)));
+
+        content.addView(loginFeatureRow(), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(82)));
 
         LinearLayout panel = new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
@@ -1185,6 +1236,124 @@ private String getLanguageCode() {
         panel.addView(google, googleParams);
 
         content.addView(panel, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        TextView terms = text(ui("Devam ederek Kullanım Şartları ve Gizlilik Politikası'nı kabul etmiş olursun.",
+                "By continuing, you accept the Terms and Privacy Policy."), 12, COLOR_MUTED, Typeface.NORMAL);
+        terms.setGravity(Gravity.CENTER);
+        terms.setPadding(dp(8), dp(10), dp(8), 0);
+        content.addView(terms, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    }
+
+    private void buildOnboardingScreen() {
+        content.setPadding(dp(24), dp(14), dp(24), dp(18));
+        content.setBackgroundColor(COLOR_BG);
+        content.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        TextView skip = text(ui("Atla", "Skip"), 16, COLOR_PRIMARY, Typeface.BOLD);
+        skip.setGravity(Gravity.RIGHT);
+        skip.setOnClickListener(v -> completeOnboarding());
+        content.addView(skip, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(40)));
+
+        SpaceLike(dp(12));
+
+        TextView title = text(ui("Aboneliklerini\ntek yerde takip et", "Track subscriptions\nin one place"), 28, COLOR_TEXT, Typeface.BOLD);
+        title.setGravity(Gravity.LEFT);
+        title.setLineSpacing(dp(1), 1.0f);
+        content.addView(title, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        TextView copy = text(ui("Tüm aboneliklerini kolayca yönet,\nödeme günlerini kaçırma.", "Manage every subscription easily,\nand never miss payment days."), 15, COLOR_MUTED, Typeface.NORMAL);
+        copy.setPadding(0, dp(12), 0, dp(14));
+        content.addView(copy, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        content.addView(subscriptionMockupHero(), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(300)));
+
+        LinearLayout dots = new LinearLayout(this);
+        dots.setGravity(Gravity.CENTER);
+        dots.addView(pageDot(true));
+        dots.addView(pageDot(false));
+        dots.addView(pageDot(false));
+        LinearLayout.LayoutParams dotsParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(34));
+        dotsParams.setMargins(0, dp(4), 0, dp(12));
+        content.addView(dots, dotsParams);
+
+        Button start = primaryButton(ui("Başla", "Start") + "  →");
+        start.setOnClickListener(v -> completeOnboarding());
+        content.addView(start, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(58)));
+    }
+
+    private View pageDot(boolean active) {
+        TextView dot = text("•", active ? 24 : 22, active ? COLOR_PRIMARY : Color.rgb(196, 208, 220), Typeface.BOLD);
+        dot.setGravity(Gravity.CENTER);
+        return dot;
+    }
+
+    private View subscriptionMockupHero() {
+        FrameLayout hero = new FrameLayout(this);
+        hero.setPadding(0, 0, 0, 0);
+
+        View blob = new View(this);
+        blob.setBackground(round(Color.rgb(222, 247, 248), dp(80), 0));
+        FrameLayout.LayoutParams blobParams = new FrameLayout.LayoutParams(dp(310), dp(178), Gravity.CENTER);
+        hero.addView(blob, blobParams);
+
+        LinearLayout phone = new LinearLayout(this);
+        phone.setOrientation(LinearLayout.VERTICAL);
+        phone.setPadding(dp(16), dp(20), dp(16), dp(14));
+        phone.setBackground(round(Color.rgb(238, 253, 254), dp(24), COLOR_PRIMARY));
+        phone.setRotation(-3f);
+        phone.setElevation(dp(3));
+        phone.addView(mockLine(dp(54), Color.rgb(206, 229, 234)));
+        addMockSubscriptionRow(phone, "netflix", Color.rgb(214, 229, 233));
+        addMockSubscriptionRow(phone, "youtube", Color.rgb(214, 229, 233));
+        addMockSubscriptionRow(phone, "spotify", Color.rgb(214, 229, 233));
+        addMockSubscriptionRow(phone, "disney", Color.rgb(214, 229, 233));
+        FrameLayout.LayoutParams phoneParams = new FrameLayout.LayoutParams(dp(150), dp(210), Gravity.CENTER);
+        phoneParams.topMargin = dp(18);
+        hero.addView(phone, phoneParams);
+
+        addFloatingLogo(hero, "amazon", 26, 78, Gravity.LEFT | Gravity.CENTER_VERTICAL);
+        addFloatingLogo(hero, "youtube", 26, 30, Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        addFloatingLogo(hero, "disney", 26, 92, Gravity.RIGHT | Gravity.BOTTOM);
+        addFloatingIcon(hero, "✓", 28, 24, Gravity.LEFT | Gravity.BOTTOM);
+        addFloatingIcon(hero, "!", 24, 26, Gravity.RIGHT | Gravity.TOP);
+        return hero;
+    }
+
+    private void addMockSubscriptionRow(LinearLayout phone, String service, int lineColor) {
+        LinearLayout row = new LinearLayout(this);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(7), dp(5), dp(7), dp(5));
+        row.setBackground(round(Color.WHITE, dp(9), 0));
+        row.addView(serviceLogo(service, "Abonelik"), new LinearLayout.LayoutParams(dp(24), dp(24)));
+        LinearLayout lines = new LinearLayout(this);
+        lines.setOrientation(LinearLayout.VERTICAL);
+        lines.setPadding(dp(7), 0, 0, 0);
+        lines.addView(mockLine(dp(58), lineColor));
+        lines.addView(mockLine(dp(40), lineColor));
+        row.addView(lines, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        TextView arrow = text("›", 20, Color.rgb(174, 193, 202), Typeface.BOLD);
+        arrow.setGravity(Gravity.CENTER);
+        row.addView(arrow, new LinearLayout.LayoutParams(dp(14), dp(30)));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(38));
+        params.setMargins(0, dp(6), 0, 0);
+        phone.addView(row, params);
+    }
+
+    private void addFloatingLogo(FrameLayout hero, String service, int sizeDp, int offsetDp, int gravity) {
+        View logo = serviceLogo(service, "Abonelik");
+        logo.setBackground(round(Color.WHITE, dp(12), Color.rgb(238, 243, 248)));
+        logo.setElevation(dp(4));
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(dp(sizeDp + 24), dp(sizeDp + 24), gravity);
+        params.setMargins(dp(offsetDp), dp(20), dp(offsetDp), dp(20));
+        hero.addView(logo, params);
+    }
+
+    private void addFloatingIcon(FrameLayout hero, String value, int sizeDp, int offsetDp, int gravity) {
+        TextView icon = iconBox(value, Color.WHITE, COLOR_PRIMARY);
+        icon.setElevation(dp(4));
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(dp(sizeDp + 30), dp(sizeDp + 30), gravity);
+        params.setMargins(dp(offsetDp), dp(20), dp(offsetDp), dp(20));
+        hero.addView(icon, params);
     }
 
     private View loginFeatureRow() {
